@@ -1,6 +1,6 @@
 import { getStore } from '@/server/db';
 import { SpeechStore } from '@/server/narration/store';
-import { speechConfig } from '@/server/providers/tts/minimax';
+import { speechConfig } from '@/server/providers/tts';
 import { errorResponse, localMutation } from '@/server/http';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -15,7 +15,9 @@ export async function POST(request: Request, context: Context) {
   try {
     localMutation(request); const { projectId } = await context.params;
     const config = speechConfig();
-    if (!config.configured) throw new Error('尚未配置 MiniMax。请在 .env.local 填写 MINIMAX_API_KEY，并重启 Web 和 Worker');
+    if (!config.configured) throw new Error(config.provider === 'tencent'
+      ? '尚未配置腾讯云。请在 .env.local 填写 TENCENT_SECRET_ID 和 TENCENT_SECRET_KEY，并重启 Web 和 Worker'
+      : '尚未配置 MiniMax。请在 .env.local 填写 MINIMAX_API_KEY，并重启 Web 和 Worker');
     const body = await request.json();
     if (body.force !== undefined && typeof body.force !== 'boolean') throw new Error('重做参数不正确');
     return Response.json(new SpeechStore(getStore()).enqueue(projectId, body.version, body.sceneIds, config, body.force === true), { status: 202 });

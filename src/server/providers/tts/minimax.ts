@@ -2,7 +2,7 @@ import type { SpeechConfig, SpeechJob } from '../../../shared/narration.ts';
 export function speechConfig(): SpeechConfig {
   const raw = process.env.MINIMAX_PRICE_PER_10K_CHARS;
   const price = raw && raw.trim() ? Number(raw) : NaN;
-  return { configured: Boolean(process.env.MINIMAX_API_KEY?.trim()), model: process.env.MINIMAX_TTS_MODEL || 'speech-2.6-hd', pricePer10k: Number.isFinite(price) && price >= 0 ? price : null };
+  return { provider: 'minimax', configured: Boolean(process.env.MINIMAX_API_KEY?.trim()), model: process.env.MINIMAX_TTS_MODEL || 'speech-2.6-hd', pricePer10k: Number.isFinite(price) && price >= 0 ? price : null };
 }
 export function parseMiniMaxResult(raw: unknown) {
   const r = raw as { base_resp?: { status_code?: number }; data?: { audio?: string }; extra_info?: { audio_length?: number; usage_characters?: number } };

@@ -1,6 +1,6 @@
 import { randomUUID } from 'node:crypto';
 import { ConflictError, NotFoundError, ProjectStore } from '../db/store.ts';
-import { narrationSignature, voiceOf } from '../../shared/narration.ts';
+import { narrationSignature, providerForModel, voiceOf } from '../../shared/narration.ts';
 import type { AudioTrack, NarrationAsset, SpeechJob } from '../../shared/narration.ts';
 import type { Project } from '../../shared/lesson.ts';
 type Row = Record<string, unknown>;
@@ -19,7 +19,7 @@ export class SpeechStore {
   }
   asset(id: string): NarrationAsset | undefined { const row = this.projects.db.prepare('SELECT payload FROM speech_assets WHERE id=?').get(id); return row ? decode<NarrationAsset>(row) : undefined; }
   job(id: string): SpeechJob | undefined { const row = this.projects.db.prepare('SELECT payload FROM speech_jobs WHERE id=?').get(id); return row ? decode<SpeechJob>(row) : undefined; }
-  ready(project: Project, model?: string) { return this.list(project.id).assets.filter((asset, index, all) => (!model || asset.model === model) && project.lesson.scenes.some(s => s.id === asset.sceneId && narrationSignature(s) === asset.signature) && all.findIndex(a => a.sceneId === asset.sceneId && a.signature === asset.signature && (!model || a.model === model)) === index); }
+  ready(project: Project, model?: string) { return this.list(project.id).assets.filter((asset, index, all) => (!model || asset.model === model) && project.lesson.scenes.some(s => s.id === asset.sceneId && narrationSignature(s, providerForModel(asset.model)) === asset.signature) && all.findIndex(a => a.sceneId === asset.sceneId && a.signature === asset.signature && a.model === asset.model && (!model || a.model === model)) === index); }
   enqueue(projectId: string, version: number, ids: string[], config: { model: string; pricePer10k: number | null }, force = false) {
     const db = this.projects.db; db.exec('BEGIN IMMEDIATE');
     try {
@@ -31,12 +31,13 @@ export class SpeechStore {
       const existing = this.list(projectId);
       for (const id of ids) {
         const scene = project.lesson.scenes.find(s => s.id === id)!;
-        const signature = narrationSignature(scene);
+        const provider = providerForModel(config.model);
+        const signature = narrationSignature(scene, provider);
         const pending = existing.jobs.find(j => j.sceneId === id && j.signature === signature && j.model === config.model && (j.status === 'queued' || j.status === 'running'));
         if (pending) { result.jobs.push(pending); continue; }
         const reusable = existing.assets.find(a => a.sceneId === id && a.signature === signature && a.model === config.model);
         if (!force && reusable) { result.reused.push(reusable); continue; }
-        const job: SpeechJob = { id: randomUUID(), projectId, sceneId: id, version, signature, text: scene.narration, model: config.model, voice: voiceOf(scene), pricePer10k: config.pricePer10k, status: 'queued', error: null, createdAt: new Date().toISOString() };
+        const job: SpeechJob = { id: randomUUID(), projectId, sceneId: id, version, signature, text: scene.narration, model: config.model, voice: voiceOf(scene, provider), pricePer10k: config.pricePer10k, status: 'queued', error: null, createdAt: new Date().toISOString() };
         db.prepare('INSERT INTO speech_jobs VALUES(?,?,?,?)').run(job.id, projectId, job.status, JSON.stringify(job)); result.jobs.push(job);
       }
       db.exec('COMMIT'); return result;

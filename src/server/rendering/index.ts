@@ -7,6 +7,7 @@ import { managedPath } from '../storage/index.ts';
 import { getStore } from '../db/index.ts';
 import { SpeechStore } from '../narration/store.ts';
 import type { PreviewAudio } from '../../shared/narration.ts';
+import { audioContentType } from '../providers/tts/index.ts';
 
 let bundlePromise: Promise<string> | undefined;
 export async function renderJob(job: Job, onProgress: (progress: number) => void): Promise<string> {
@@ -20,7 +21,7 @@ export async function renderJob(job: Job, onProgress: (progress: number) => void
     const asset = speech.asset(track.assetId);
     if (!asset || asset.projectId !== job.projectId || asset.sceneId !== track.sceneId) throw new Error('导出引用的配音资产不存在');
     const bytes = await readFile(managedPath(asset.path));
-    audio[track.sceneId] = { src: `data:audio/mpeg;base64,${bytes.toString('base64')}`, durationSeconds: asset.durationSeconds };
+    audio[track.sceneId] = { src: `data:${audioContentType(asset.path)};base64,${bytes.toString('base64')}`, durationSeconds: asset.durationSeconds };
   }
   const inputProps = { lesson: job.lesson, audio };
   const composition = await selectComposition({ serveUrl, id: 'Lesson', inputProps, browserExecutable });

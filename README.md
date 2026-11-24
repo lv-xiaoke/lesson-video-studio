@@ -2,7 +2,7 @@
 
 使用 Next.js、React 与 Remotion，将教学内容组织成小节，在网页中编辑、保存、预览并提交后台制作视频。
 
-当前是本地单人使用的第二阶段：编辑讲解稿与画面 → 分小节生成 MiniMax 配音 → 按实际音频时长预览 → 导出带配音 MP4。支持试听、局部重做、缓存复用与参考费用。AI 自动编稿和多人登录尚未接入；无密钥时仍可编辑、保存和导出无声视频。
+当前是本地单人使用的第二阶段：编辑讲解稿与画面 → 分小节调用腾讯云或 MiniMax 生成配音 → 按实际音频时长预览 → 导出带配音 MP4。默认使用腾讯云精品音色，配音通过云 API 完成，本机不部署语音模型。支持试听、局部重做和缓存复用。AI 自动编稿和多人登录尚未接入；无密钥时仍可编辑、保存和导出无声视频。
 
 ## 环境与安装
 
@@ -17,11 +17,35 @@ Copy-Item .env.example .env.local
 
 真实配置不要提交 Git。默认数据放在项目根目录 `data/`，可通过 `DATA_DIR` 修改。Web 和 Worker 必须在同一项目根目录运行，并使用同一份配置。
 
-### 配置 MiniMax
+### 配置腾讯云（默认）
+
+1. 在[语音合成控制台](https://console.cloud.tencent.com/tts)开通服务，领取基础/精品音色免费资源包，并在「语音合成设置」确认后付费关闭。免费资源包有有效期，实际剩余额度以控制台为准。
+2. 创建专用于项目的子用户，开启编程访问并关联 `QcloudTTSFullAccess`，保存子用户的 `SecretId` 和 `SecretKey`。
+3. 已有 `.env.local` 时只追加缺失配置；同名项直接修改，避免重复。不要覆盖原有数据目录等配置：
+
+```dotenv
+TTS_PROVIDER=tencent
+TENCENT_SECRET_ID=你的SecretId
+TENCENT_SECRET_KEY=你的SecretKey
+```
+
+4. 重启 Web 和 Worker。编辑器会显示「腾讯云精品音色」，默认智瑜（`101001`），也可选择智云、智燕、智瑞。
+5. 先生成一小节试听，再生成其余配音，最后导出带配音 MP4。
+
+密钥仅放在本机 `.env.local`，不要写进网页、源码、聊天或 Git。客户端只知道配置是否齐全，不会收到密钥。
+
+本项目使用通用语音合成下的 `TextToVoice` 基础接口，不使用不适用该免费资源包的长文本接口。每段最多 150 个 UTF-16 单元及 450 字节，优先按句末标点分段；依次请求 16 kHz 单声道 16-bit PCM，拼接后封装为 WAV，通过采样数计算真实时长。语速按厂商公开档位近似换算。合成任一分段失败后停止后续请求，不自动重试；此前完成的分段可能已经扣减额度，手动重试会重新请求整节。
+
+切换服务时，不兼容的旧音色使用当前服务的默认音色，不改写原项目；各服务音频缓存分别匹配。已有的 MiniMax 项目需显式配置 `TTS_PROVIDER=minimax` 才会继续使用 MiniMax。
+
+正式接口依据：[腾讯云基础语音合成](https://cloud.tencent.com/document/api/1073/37995)、[腾讯云音色列表](https://cloud.tencent.com/document/product/1073/92668)。免费额度用量与有效期由腾讯云管理，应用不声称已同步余额，也不会替你开启后付费。
+
+### 配置 MiniMax（可选）
 
 已有 `.env.local` 时，只追加下面的配置，不要覆盖已有内容：
 
 ```dotenv
+TTS_PROVIDER=minimax
 MINIMAX_API_KEY=你的本机密钥
 MINIMAX_TTS_MODEL=speech-2.6-hd
 MINIMAX_PRICE_PER_10K_CHARS=
@@ -101,7 +125,7 @@ node scripts/verify-app.mjs
 node scripts/verify-narration.mjs
 ```
 
-此脚本启动隔离端口和独立数据目录，仅向本机 MiniMax 协议夹具发送请求，返回测试音，不使用真实密钥、不调用厂商、不产生费用。验证重复请求、缓存复用、失败重试、音频范围请求、旧配音失效及带音轨 MP4。测试音不是 MiniMax 真实配音效果证明。结果和日志位于 `data/narration-verification/`。
+此脚本启动隔离端口和独立数据目录，默认验证 MiniMax；验证腾讯云时设置 `$env:VERIFY_TTS_PROVIDER='tencent'` 后运行相同命令。它仅向本机协议夹具发送请求，返回测试音，不使用真实密钥、不调用厂商、不产生费用。验证重复请求、缓存复用、失败重试、音频范围请求、旧配音失效及带音轨 MP4；腾讯云还验证长讲解分段和 WAV 试听下载。测试音不是厂商真实配音效果证明。结果和日志位于 `data/narration-verification/`。
 
 测试覆盖时间计算、输入校验、并发版本保护、任务快照、Worker 互斥、配音缓存与模型切换、媒体范围请求及本机来源检查。业务数据测试使用内存 SQLite；媒体和锁测试在 `data/test-runs/` 创建独立文件，不改动真实项目数据。
 
@@ -111,7 +135,7 @@ node scripts/verify-narration.mjs
 - `src/features/`：项目列表和编辑界面。
 - `src/shared/`：项目、小节、任务的数据定义。
 - `src/video/`：预览与导出共用的教学画面和时间安排。
-- `src/server/`：SQLite、文件存储、配音队列、MiniMax 接入和视频导出。
+- `src/server/`：SQLite、文件存储、配音队列、腾讯云 / MiniMax 接入和视频导出。
 - `src/worker/`：后台任务执行入口。
 - `data/`：真实数据库、生成视频和导出清单，不提交 Git。
 - `docs/architecture/project-structure.md`：目标目录设计；未实现的目录随功能增加。

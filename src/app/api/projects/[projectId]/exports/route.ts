@@ -1,7 +1,7 @@
 import { getStore } from '@/server/db';
 import { errorResponse, localMutation } from '@/server/http';
 import { SpeechStore } from '@/server/narration/store';
-import { speechConfig } from '@/server/providers/tts/minimax';
+import { speechConfig } from '@/server/providers/tts';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 type Context = { params: Promise<{ projectId: string }> };

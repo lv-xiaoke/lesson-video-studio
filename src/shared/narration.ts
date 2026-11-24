@@ -1,8 +1,27 @@
 import type { Scene } from './scene.ts';
 export type VoiceSettings = { voiceId: string; speed: number };
+export type SpeechProvider = 'minimax' | 'tencent';
+export const TENCENT_MODEL = 'tencent-basic-v1';
+export const TENCENT_VOICES = [
+  { id: '101001', name: '智瑜 · 情感女声' },
+  { id: '101004', name: '智云 · 通用男声' },
+  { id: '101011', name: '智燕 · 新闻女声' },
+  { id: '101021', name: '智瑞 · 新闻男声' },
+] as const;
+export const providerForModel = (model: string): SpeechProvider => model === TENCENT_MODEL ? 'tencent' : 'minimax';
 export const DEFAULT_VOICE: VoiceSettings = { voiceId: 'male-qn-qingse', speed: 1 };
-export const voiceOf = (scene: Scene): VoiceSettings => scene.voice || DEFAULT_VOICE;
-export const narrationSignature = (scene: Scene) => JSON.stringify([scene.narration, voiceOf(scene).voiceId, voiceOf(scene).speed]);
+export function voiceOf(scene: Scene, provider: SpeechProvider = 'minimax'): VoiceSettings {
+  const voice = scene.voice || DEFAULT_VOICE;
+  if (provider === 'tencent') return {
+    voiceId: TENCENT_VOICES.some(v => v.id === voice.voiceId) ? voice.voiceId : '101001',
+    speed: Math.max(0.6, voice.speed),
+  };
+  return { ...voice, voiceId: /^\d+$/.test(voice.voiceId) ? DEFAULT_VOICE.voiceId : voice.voiceId };
+}
+export const narrationSignature = (scene: Scene, provider: SpeechProvider = 'minimax') => {
+  const voice = voiceOf(scene, provider);
+  return JSON.stringify([scene.narration, voice.voiceId, voice.speed]);
+};
 export type AudioTrack = { sceneId: string; assetId: string; durationSeconds: number };
 export type PreviewAudio = Record<string, { src: string; durationSeconds: number }>;
 export type SpeechJob = {
@@ -16,7 +35,7 @@ export type NarrationAsset = {
   path: string; createdAt: string;
 };
 export type SpeechState = { assets: NarrationAsset[]; jobs: SpeechJob[] };
-export type SpeechConfig = { configured: boolean; model: string; pricePer10k: number | null };
+export type SpeechConfig = { provider: SpeechProvider; configured: boolean; model: string; pricePer10k: number | null };
 export function estimateSpeechCost(text: string, price: number | null) {
   return price === null ? null : Math.round(Array.from(text).length * price / 10_000 * 1_000_000) / 1_000_000;
 }
