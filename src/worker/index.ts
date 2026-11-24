@@ -4,18 +4,28 @@ import { getStore } from '../server/db/index.ts';
 import { dataRoot } from '../server/storage/index.ts';
 import { renderJob } from '../server/rendering/index.ts';
 import { acquireWorkerGuard } from '../server/jobs/worker-guard.ts';
+import { SpeechStore } from '../server/narration/store.ts';
+import { processSpeechJob } from '../server/narration/process.ts';
 
 // Dedicated SQLite transaction provides an OS-released lock on process exit.
 const guard = acquireWorkerGuard(join(dataRoot(), 'worker-guard.sqlite'));
 const store = getStore();
+const speech = new SpeechStore(store);
 let stopping = false;
 for (const signal of ['SIGINT', 'SIGTERM'] as const) process.on(signal, () => { stopping = true; console.log('正在等待当前任务结束后退出…'); });
 store.recoverInterrupted();
+speech.recoverInterrupted();
 console.log('知帧后台制作程序已启动，等待导出任务。');
 try {
   while (!stopping) {
+    const speechJob = speech.claim();
+    if (speechJob) {
+      console.log(`开始配音 ${speechJob.id}，小节 ${speechJob.sceneId}`);
+      try { await processSpeechJob(speechJob, speech); console.log(`配音完成 ${speechJob.id}`); }
+      catch (error) { const message = error instanceof Error ? error.message : '配音失败'; speech.fail(speechJob.id, message); console.error(message); }
+    }
     const job = store.claim();
-    if (!job) { await pause(1000); continue; }
+    if (!job) { if (!speechJob) await pause(1000); continue; }
     console.log(`开始制作 ${job.id}，项目版本 ${job.version}`);
     try {
       let last = 0;

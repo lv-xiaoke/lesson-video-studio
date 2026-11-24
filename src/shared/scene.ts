@@ -1,3 +1,4 @@
+import type { VoiceSettings } from './narration.ts';
 export type SceneKind = 'title' | 'array' | 'summary';
 export type Scene = {
   id: string;
@@ -6,4 +7,5 @@ export type Scene = {
   content: string;
   narration: string;
   durationSeconds: number;
+  voice?: VoiceSettings;
 };

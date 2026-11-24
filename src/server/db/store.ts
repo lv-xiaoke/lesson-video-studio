@@ -3,10 +3,11 @@ import { randomUUID } from 'node:crypto';
 import { createExampleLesson, parseLesson } from '../../shared/lesson.ts';
 import type { Lesson, Project } from '../../shared/lesson.ts';
 import type { Job } from '../../shared/job.ts';
+import type { AudioTrack } from '../../shared/narration.ts';
 
 type Row = Record<string, unknown>;
 const decodeProject = (row: Row): Project => ({ id: String(row.id), version: Number(row.version), updatedAt: String(row.updated_at), lesson: parseLesson(JSON.parse(String(row.lesson))) });
-const decodeJob = (row: Row): Job => ({ id: String(row.id), projectId: String(row.project_id), version: Number(row.version), lesson: parseLesson(JSON.parse(String(row.lesson))), status: row.status as Job['status'], progress: Number(row.progress), output: row.output as string | null, error: row.error as string | null, createdAt: String(row.created_at), updatedAt: String(row.updated_at) });
+const decodeJob = (row: Row): Job => ({ id: String(row.id), projectId: String(row.project_id), version: Number(row.version), lesson: parseLesson(JSON.parse(String(row.lesson))), status: row.status as Job['status'], progress: Number(row.progress), output: row.output as string | null, error: row.error as string | null, createdAt: String(row.created_at), updatedAt: String(row.updated_at), audio: JSON.parse(String(row.audio || '[]')) });
 
 export class ConflictError extends Error {}
 export class NotFoundError extends Error {}
@@ -20,6 +21,11 @@ export class ProjectStore {
       CREATE TABLE IF NOT EXISTS jobs(id TEXT PRIMARY KEY, project_id TEXT NOT NULL, version INTEGER NOT NULL, lesson TEXT NOT NULL, status TEXT NOT NULL, progress REAL NOT NULL, output TEXT, error TEXT, created_at TEXT NOT NULL, updated_at TEXT NOT NULL);
       CREATE INDEX IF NOT EXISTS jobs_project ON jobs(project_id,created_at);
       CREATE INDEX IF NOT EXISTS jobs_status ON jobs(status,created_at);`);
+    this.db.exec('BEGIN IMMEDIATE');
+    try {
+      if (!this.db.prepare('PRAGMA table_info(jobs)').all().some(row => row.name === 'audio')) this.db.exec("ALTER TABLE jobs ADD COLUMN audio TEXT NOT NULL DEFAULT '[]'");
+      this.db.exec('COMMIT');
+    } catch (error) { this.db.exec('ROLLBACK'); throw error; }
   }
   close() { this.db.close(); }
   list(): Project[] { return this.db.prepare('SELECT * FROM projects ORDER BY updated_at DESC').all().map(row => decodeProject(row)); }
@@ -40,12 +46,12 @@ export class ProjectStore {
     }
     return this.get(id)!;
   }
-  enqueue(projectId: string, version: number): Job {
+  enqueue(projectId: string, version: number, audio: AudioTrack[] = []): Job {
     const project = this.get(projectId);
     if (!project) throw new NotFoundError('项目不存在');
     if (project.version !== version) throw new ConflictError('项目已被修改，请保存最新版本后导出');
     const id = randomUUID(); const now = new Date().toISOString();
-    this.db.prepare('INSERT INTO jobs VALUES(?,?,?,?,?,?,?,?,?,?)').run(id, projectId, version, JSON.stringify(project.lesson), 'queued', 0, null, null, now, now);
+    this.db.prepare('INSERT INTO jobs VALUES(?,?,?,?,?,?,?,?,?,?,?)').run(id, projectId, version, JSON.stringify(project.lesson), 'queued', 0, null, null, now, now, JSON.stringify(audio));
     return this.job(id)!;
   }
   jobs(projectId: string): Job[] { return this.db.prepare('SELECT * FROM jobs WHERE project_id=? ORDER BY created_at DESC LIMIT 20').all(projectId).map(row => decodeJob(row)); }

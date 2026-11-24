@@ -21,7 +21,15 @@ export function parseLesson(value: unknown): Lesson {
     ids.add(id);
     if (typeof s.kind !== 'string' || !['title', 'array', 'summary'].includes(s.kind)) throw new Error('未知的画面类型');
     if (typeof s.durationSeconds !== 'number' || !Number.isFinite(s.durationSeconds) || s.durationSeconds < 3 || s.durationSeconds > 60) throw new Error('每小节时长应为 3～60 秒');
-    return { id, kind: s.kind as Scene['kind'], title: text(s.title, '小节标题', 100), content: text(s.content, '画面文字', 1000), narration: text(s.narration, '讲解稿', 3000), durationSeconds: s.durationSeconds };
+    let voice: Scene['voice'];
+    if (s.voice !== undefined) {
+      if (!s.voice || typeof s.voice !== 'object') throw new Error('音色设置不正确');
+      const v = s.voice as Record<string, unknown>;
+      if (typeof v.voiceId !== 'string' || !/^[a-zA-Z0-9_-]{1,100}$/.test(v.voiceId)) throw new Error('音色 ID 不正确');
+      if (typeof v.speed !== 'number' || !Number.isFinite(v.speed) || v.speed < 0.5 || v.speed > 2) throw new Error('语速应为 0.5～2 倍');
+      voice = { voiceId: v.voiceId, speed: v.speed };
+    }
+    return { id, kind: s.kind as Scene['kind'], title: text(s.title, '小节标题', 100), content: text(s.content, '画面文字', 1000), narration: text(s.narration, '讲解稿', 3000), durationSeconds: s.durationSeconds, ...(voice ? { voice } : {}) };
   });
   return { title, scenes };
 }
