@@ -1,0 +1,225 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="用一条30秒保温杯介绍视频，读懂AI视频制作的六个环节、现有工具和适合小团队验证的产品机会。">
+<title>从一条视频开始，读懂 AI 视频自动化 · 入门易读版</title>
+<style>
+:root{--ink:#20352f;--muted:#586b64;--green:#245e4b;--pale:#edf4ef;--orange:#a44427;--line:#dce5de;--page:#fff;--bg:#f5f8f5;--soft:#f7f9f7;scroll-padding-top:92px;scroll-behavior:smooth}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:18px/1.95 "Microsoft YaHei","PingFang SC",system-ui,sans-serif}a{color:var(--green);text-underline-offset:4px}a:hover{color:var(--orange)}button{font:inherit;cursor:pointer}button:disabled{cursor:default;opacity:.4}button:focus-visible,a:focus-visible,summary:focus-visible{outline:3px solid #bb623d;outline-offset:5px}::selection{background:#d6e9dc}.topbar{background:#fff;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:10}.topinner{max-width:1060px;margin:auto;padding:14px 30px;display:flex;align-items:center;justify-content:space-between;gap:20px}.brand{font-size:15px;font-weight:700;white-space:nowrap}.topbar nav{display:flex;gap:23px;flex-wrap:wrap}.topbar a{font-size:14px;text-decoration:none}.print{font-size:14px;border:1px solid var(--line);background:#fff;padding:5px 12px;border-radius:6px;white-space:nowrap}main{max-width:850px;margin:auto;padding:0 32px 70px}.hero{padding:65px 0 24px}.eyebrow{font-size:14px;color:var(--green);letter-spacing:2px;font-weight:700}h1{font-size:clamp(34px,5.3vw,52px);line-height:1.4;letter-spacing:-1.5px;margin:17px 0 19px}h1 span{color:var(--green)}.lead{font-size:21px;line-height:1.85;color:var(--muted)}.reading-route{font-size:15px;padding:15px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line);margin:28px 0 19px}.meta{font-size:14px;color:var(--muted)}p{margin:13px 0}h2{font-size:29px;line-height:1.5;margin:8px 0 19px;letter-spacing:-.5px}h3{font-size:21px;line-height:1.65;margin:26px 0 10px}section{margin-top:62px;scroll-margin-top:90px}.section-label{font-size:14px;color:var(--green);letter-spacing:1px}.takeaway{padding:19px 23px;background:var(--pale);border-left:4px solid var(--green);margin:23px 0;font-size:19px;line-height:1.85}.takeaway p{margin:0}.small{font-size:15px;color:var(--muted);line-height:1.85}.principle{display:grid;grid-template-columns:45px 1fr;gap:13px;padding:23px 0;border-bottom:1px solid var(--line)}.principle .num{font-size:27px;color:var(--green);line-height:1.6}.principle h3{margin:0;font-size:21px}.principle p{margin:6px 0 0}.example{background:var(--page);border:1px solid var(--line);padding:25px 28px;border-radius:12px;margin-top:25px}.example-title{font-size:14px;color:var(--orange);font-weight:700}.facts{display:flex;gap:9px;flex-wrap:wrap;margin:16px 0}.facts span{font-size:14px;background:var(--soft);border:1px solid var(--line);border-radius:5px;padding:3px 10px}.storyboard{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:25px 0}.shot{background:white;border:1px solid var(--line);border-radius:9px;padding:16px 13px}.shot .time{font-size:13px;color:var(--green);font-weight:bold}.shot .scene{height:105px;display:flex;align-items:center;justify-content:center;background:var(--pale);margin:11px 0;border-radius:5px;position:relative}.cup{height:64px;width:33px;border:2px solid var(--green);border-radius:5px 5px 10px 10px;background:#f9fcfa;position:relative}.cup:before{content:"";position:absolute;top:8px;left:0;right:0;border-top:2px solid var(--green)}.cup:after{content:"";position:absolute;top:25px;left:8px;width:13px;height:3px;background:#a9c7b4;border-radius:1px}.bag{width:65px;height:71px;border:2px solid #7d9784;border-radius:9px;position:relative;display:flex;justify-content:flex-end;padding-right:3px;padding-top:13px}.bag:before{content:"";position:absolute;top:-11px;left:22px;width:18px;height:10px;border:2px solid #7d9784;border-bottom:0;border-radius:6px 6px 0 0}.bag .cup{height:47px;width:23px}.bag .cup:after{left:5px;width:9px}.lid{width:38px;height:12px;border:2px solid var(--green);border-radius:4px;margin-left:11px}.shot .price{font-size:28px;font-weight:700;color:var(--green)}.shot b{font-size:15px;display:block}.shot p{font-size:14px;color:var(--muted);line-height:1.75;margin:5px 0 0}.diagram-note{font-size:13px;color:var(--muted)}.learn-box{border:1px solid var(--line);border-radius:12px;background:#fff;overflow:hidden;margin-top:24px}.step-buttons{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border-bottom:1px solid var(--line)}.step-buttons button{border:0;border-radius:0;padding:12px;background:#f4f7f4;color:var(--muted);font-size:16px;line-height:1.6;text-align:left}.step-buttons button span{display:block;font-size:13px}.step-buttons button[aria-pressed="true"]{background:var(--green);color:#fff}.step-panel{padding:28px 30px;border-bottom:1px solid var(--line)}.step-panel:last-of-type{border-bottom:0}.enhanced .step-panel:not(.is-active){display:none}.step-title{font-size:24px;margin:6px 0 19px}.step-index{font-size:14px;color:var(--green);font-weight:bold}.explain-block{margin:19px 0}.explain-block .label{font-size:14px;font-weight:bold;color:var(--green);display:block;margin-bottom:4px}.explain-block p{margin:0}.sample{background:var(--soft);border-radius:7px;padding:16px 18px;margin:10px 0;font-size:16px;line-height:1.9}.pitfall{border-left:3px solid #c58b66;padding:0 0 0 17px;margin:21px 0}.pitfall .label{color:var(--orange)}.step-controls{display:none;padding:17px 22px;align-items:center;justify-content:space-between;gap:12px;border-top:1px solid var(--line);background:var(--soft)}.enhanced .step-controls{display:flex}.step-controls button{border:1px solid var(--line);background:#fff;padding:7px 17px;border-radius:6px;font-size:15px}.step-controls .next{background:var(--green);color:#fff;border-color:var(--green)}.step-count{font-size:14px;color:var(--muted)}details{margin:17px 0;border-top:1px solid var(--line);padding-top:14px}summary{font-size:16px;cursor:pointer;color:var(--green);font-weight:600}details p,details li{font-size:16px;line-height:1.9}.related{font-size:14px!important;color:var(--muted);line-height:1.9!important}.related a{margin-right:9px}.tool-group{padding:22px 0;border-bottom:1px solid var(--line)}.tool-group h3{margin-top:0}.tool-group p{margin:7px 0}.tool-name{font-weight:600;color:var(--green)}.tool-level{font-size:14px;color:var(--muted)}.compare{width:100%;border-collapse:collapse;font-size:16px;line-height:1.85;background:#fff}.compare th,.compare td{text-align:left;vertical-align:top;padding:15px 17px;border-bottom:1px solid var(--line)}.compare th{background:var(--pale)}.table-wrap{border:1px solid var(--line);border-radius:9px;overflow:auto;margin:22px 0}.compare td:first-child{font-weight:600;min-width:110px}.decision{padding:25px 0;border-bottom:1px solid var(--line)}.decision h3{margin-top:0}.decision .reason{font-size:16px;color:var(--muted)}.opportunity{padding:25px 27px;background:#fff;border:1px solid var(--line);border-radius:10px;margin:20px 0}.opportunity h3{margin:7px 0 16px}.opportunity .tag{font-size:14px;color:var(--green)}.opportunity .question{background:var(--pale);padding:13px 16px;border-radius:5px;font-size:16px}.glossary details{padding:15px 0;margin:0}.glossary summary{font-size:17px}.glossary p{color:var(--muted)}.source-list{padding-left:1.3em}.source-list li{font-size:15px;margin:10px 0}.source-list a{overflow-wrap:anywhere}.end{background:var(--green);color:white;padding:25px 28px;border-radius:10px;margin:30px 0}.end p{margin:7px 0}.end a{color:#fff}footer{font-size:14px;color:var(--muted);border-top:1px solid var(--line);padding-top:23px;margin-top:50px}.skip{position:absolute;top:-100px;left:20px;background:#fff;padding:10px;z-index:20}.skip:focus{top:5px}.stage-nav-note{font-size:14px;color:var(--muted);margin:0 0 15px}ul,ol{padding-left:1.4em}li{margin:8px 0}
+@media(max-width:650px){body{font-size:17px}.topinner{padding:12px 19px;flex-wrap:wrap;gap:9px}.topbar nav{order:3;width:100%;gap:20px}.topbar a{font-size:13px}.brand{font-size:14px}.print{font-size:13px}.hero{padding-top:35px}main{padding:0 20px 40px}h1{font-size:35px;letter-spacing:-1px}.lead{font-size:19px}h2{font-size:25px}section{margin-top:45px;scroll-margin-top:115px}.storyboard{grid-template-columns:repeat(2,1fr)}.example{padding:21px}.step-buttons button{font-size:14px;padding:11px 8px}.step-buttons button span{font-size:12px}.step-panel{padding:23px 20px}.step-title{font-size:22px}.step-controls{padding:15px}.step-controls button{padding:7px 12px}.step-count{font-size:13px}.opportunity{padding:21px}.compare{min-width:540px}.takeaway{padding:16px 18px;font-size:18px}.principle{grid-template-columns:33px 1fr;gap:11px}.source-list li{font-size:14px}}
+@media(prefers-reduced-motion:reduce){:root{scroll-behavior:auto}}
+@media print{@page{size:A4;margin:17mm 14mm}body{background:#fff;font-size:11pt;line-height:1.7}.topbar,.step-buttons,.step-controls,.stage-nav-note,.skip,.no-print{display:none!important}main{max-width:none;padding:0}.hero{padding-top:0}h1{font-size:28pt}h2{font-size:20pt;break-after:avoid}h3,.step-title{font-size:14pt;break-after:avoid}.lead{font-size:13pt}.small,.meta{font-size:9pt}section{margin-top:28px}.enhanced .step-panel:not(.is-active){display:block}.step-panel{padding:20px 0;break-inside:avoid}.learn-box{border:0;overflow:visible}.storyboard{grid-template-columns:repeat(4,1fr);break-inside:avoid}.shot{padding:10px}.shot b{font-size:10pt}.shot p,.shot .time{font-size:9pt}.shot .scene{height:80px}.example,.opportunity{break-inside:avoid}.table-wrap{overflow:visible}.compare{min-width:0;font-size:10pt}.compare th,.compare td{padding:10px}.takeaway,.end{background:#edf4ef;color:#111}.end a{color:#245e4b}.principle p{font-size:11pt}details p,details li{font-size:10pt}summary{font-size:11pt}.source-list li{font-size:9pt}a{color:#245e4b;text-decoration:none}footer{font-size:9pt}.step-index{font-size:10pt}}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">跳到正文</a>
+<header class="topbar"><div class="topinner"><span class="brand">AI 视频自动化 · 入门易读版</span><nav aria-label="主目录"><a href="#example">看一个例子</a><a href="#steps">弄懂六步</a><a href="#tools">认识工具</a><a href="#opportunities">判断机会</a></nav><button type="button" class="print" id="print">打印 / 保存 PDF</button></div></header>
+<main id="main">
+<header class="hero">
+ <div class="eyebrow">给第一次了解这个方向的你</div>
+ <h1>先做懂一条视频，<br><span>再看 AI 的机会在哪里。</span></h1>
+ <p class="lead">从一条 30 秒的保温杯介绍视频开始。先看人原本要做什么，再看 AI 能帮哪一步、哪里还需要人。</p>
+ <p class="reading-route">阅读顺序：看例子 → 理解制作过程 → 分清工具 → 判断产品机会</p>
+ <p class="meta">沿用 2026 年 11 月 24 日的调研资料。正文从零解释；技术细节和工具链接可按需展开。</p>
+</header>
+
+<section id="basics">
+ <div class="section-label">先记住这三件事</div><h2>暂时不需要记住任何工具名</h2>
+ <div class="principle"><span class="num">1</span><div><h3>一段会动的画面，还不是一条完整视频。</h3><p>比如“杯子在桌上缓慢转动”只是几秒素材。完整介绍还要决定说什么、先后顺序、配音、字幕和价格是否正确。</p></div></div>
+ <div class="principle"><span class="num">2</span><div><h3>AI 视频不一定要把每个画面都凭空生成。</h3><p>你可以用自己拍的杯子视频，让 AI 帮忙写介绍、挑画面、加配音和字幕。也可以只生成缺少的一小段背景。</p></div></div>
+ <div class="principle"><span class="num">3</span><div><h3>自动做出来，与能直接拿去用，是两回事。</h3><p>片子能播放，但杯盖变了形、价格写错了，仍然不能交付。真正的产品要帮助用户完成修改，得到满意的结果。</p></div></div>
+ <p class="small">这也是后面判断机会的依据：用户需要完成什么任务，现有工具还让他费力在哪里。</p>
+</section>
+
+<section id="example">
+ <div class="section-label">看一个具体例子</div><h2>假设有人请你介绍这只保温杯</h2>
+ <div class="example"><span class="example-title">教学案例 · 不代表我们已选择电商方向</span><p>商家给你几张照片、几段实拍和一份商品资料，希望得到一条 30 秒的竖屏介绍视频。</p><div class="facts"><span>商品：绿色保温杯</span><span>容量：500 毫升</span><span>价格：79 元</span><span>目标：介绍使用场景</span></div><p class="small">以上均为虚构示例。真实制作时只能使用商家确认的信息，不能让 AI 自己编造保温时长、材质或功效。</p></div>
+ <p>你最终想交付的内容，大概长这样：</p>
+ <div class="storyboard" aria-label="30秒介绍视频的四个示意镜头，并非实际生成的视频">
+  <div class="shot"><span class="time">0–5 秒</span><div class="scene" aria-hidden="true"><div class="cup"></div></div><b>先看到商品</b><p>杯子放在桌上，让观众知道介绍什么。</p></div>
+  <div class="shot"><span class="time">5–13 秒</span><div class="scene" aria-hidden="true"><div class="bag"><div class="cup"></div></div></div><b>展示使用场景</b><p>放进包的侧袋，表现外出携带。</p></div>
+  <div class="shot"><span class="time">13–23 秒</span><div class="scene" aria-hidden="true"><div class="cup"></div><div class="lid"></div></div><b>展示具体细节</b><p>打开杯盖，用实拍展示内部。</p></div>
+  <div class="shot"><span class="time">23–30 秒</span><div class="scene"><span class="price">¥79</span></div><b>收尾说明</b><p>标出已确认的容量和价格。</p></div>
+ </div>
+ <p class="diagram-note">上图仅帮助理解镜头安排，不是产品截图、生成效果展示或真实广告。</p>
+ <div class="takeaway"><p><strong>接下来要解决的，就是把商家给的资料，变成这条能观看、信息正确的完整视频。</strong></p></div>
+</section>
+
+<section id="steps">
+ <div class="section-label">跟着同一个例子往下走</div><h2>制作一条视频，可以先理解成六步</h2>
+ <p>这些是需要完成的工作，不是必须打开六个软件。有些产品会把几步放在一起完成。</p>
+ <p class="stage-nav-note">点击步骤查看；也可以用“下一步”顺着读。每一步都说明为什么要做、AI 怎样帮助、哪里容易出错。</p>
+ <div class="learn-box" id="lesson">
+  <div class="step-buttons" role="group" aria-label="选择要阅读的制作步骤">
+   <button type="button" data-step="0" aria-pressed="true" aria-controls="step-0"><span>第 1 步</span>决定讲什么</button>
+   <button type="button" data-step="1" aria-pressed="false" aria-controls="step-1"><span>第 2 步</span>决定每段拍什么</button>
+   <button type="button" data-step="2" aria-pressed="false" aria-controls="step-2"><span>第 3 步</span>准备画面</button>
+   <button type="button" data-step="3" aria-pressed="false" aria-controls="step-3"><span>第 4 步</span>准备声音</button>
+   <button type="button" data-step="4" aria-pressed="false" aria-controls="step-4"><span>第 5 步</span>拼成完整视频</button>
+   <button type="button" data-step="5" aria-pressed="false" aria-controls="step-5"><span>第 6 步</span>检查再交付</button>
+  </div>
+  <article class="step-panel is-active" id="step-0" aria-labelledby="step-title-0">
+   <div class="step-index">第 1 步 / 共 6 步</div><h3 class="step-title" id="step-title-0">先决定这条视频要讲什么</h3>
+   <div class="explain-block"><span class="label">为什么需要这一步</span><p>30 秒放不下所有信息。得先决定给谁看、希望对方看懂什么，否则很容易变成一堆漂亮画面的堆砌。</p></div>
+   <div class="explain-block"><span class="label">放到保温杯例子里</span><div class="sample">这条片子给日常通勤的人看。先展示杯子，再展示携带和杯盖细节，最后说明容量与价格。</div><p>把要说的话和内容顺序写下来，就叫<strong>脚本</strong>。你可以先把它理解为“这条视频的内容稿”。</p></div>
+   <div class="explain-block"><span class="label">AI 怎么帮，优势是什么</span><p>把商品资料给文字 AI，让它拟几种内容稿，再挑一版修改。它很擅长快速写初稿和换表达，省下从空白开始写的时间。</p></div>
+   <div class="explain-block pitfall"><span class="label">容易出什么问题</span><p>AI 可能自行加上“保温 24 小时”等未经确认的卖点。所以快的是写稿，不代表资料已经核实。</p></div>
+   <details><summary>想多了解：常见做法与工具</summary><p>简单做法是给 AI 一份资料和要求；更复杂的产品会先让它查找企业提供的资料，再写稿。核心是让内容有依据。</p><p class="related">可以研究 <a href="https://github.com/harry0703/MoneyPrinterTurbo">MoneyPrinterTurbo</a>如何衔接主题、文案与成片，以及 <a href="https://github.com/HKUDS/ViMax">ViMax</a>如何组织故事和脚本。它们是可供开发者研究的代码项目，后面会解释“开源”。</p></details>
+  </article>
+  <article class="step-panel" id="step-1" aria-labelledby="step-title-1">
+   <div class="step-index">第 2 步 / 共 6 步</div><h3 class="step-title" id="step-title-1">把内容稿变成画面计划</h3>
+   <div class="explain-block"><span class="label">为什么需要这一步</span><p>写着“方便携带”，并没有告诉我们画面该出现什么。必须把文字变成具体画面，才能拍摄、找素材或让 AI 生成。</p></div>
+   <div class="explain-block"><span class="label">放到保温杯例子里</span><div class="sample">5–13 秒：把这只绿色杯子放进包的侧袋。画面要看清杯子和包，配音说“日常出门，可以随身带上”。</div><p>这样逐段安排画面、时长和声音，就叫<strong>分镜</strong>。一个镜头可以先理解为“一段连续的画面”。前面四张示意图就是简化的分镜。</p></div>
+   <div class="explain-block"><span class="label">AI 怎么帮，优势是什么</span><p>AI 可以把内容稿拆成若干镜头，提出画面安排。提前计划好，比做到一半才发现缺画面更容易协调。</p></div>
+   <div class="explain-block pitfall"><span class="label">容易出什么问题</span><p>AI 可能安排一个很复杂、手头又没有素材的动作。计划看着不错，实际却难做。所以每一段都要问：这画面从哪里来，做得到吗？</p></div>
+   <details><summary>想多了解：为什么不能直接一口气生成</summary><p>简单视频可以一次生成；但如果你需要准确展示商品、控制顺序或修改某个细节，先拆成镜头往往更方便检查和重做。分镜是帮助控制结果的工具，不是所有任务都必须手工填写的表格。</p><p class="related">参考 <a href="https://seko.sensetime.com/learn/ai-short-drama">Seko 创作指南</a>和 <a href="https://github.com/HKUDS/ViMax">ViMax</a>中的镜头规划思路。</p></details>
+  </article>
+  <article class="step-panel" id="step-2" aria-labelledby="step-title-2">
+   <div class="step-index">第 3 步 / 共 6 步</div><h3 class="step-title" id="step-title-2">找到或制作每一段画面</h3>
+   <div class="explain-block"><span class="label">为什么需要这一步</span><p>计划只是文字；真正做视频还要有照片、实拍或生成片段。这些用于制作的原始材料，统称<strong>素材</strong>。</p></div>
+   <div class="explain-block"><span class="label">放到保温杯例子里</span><div class="sample">杯盖细节：优先用商家实拍。<br>桌面展示：可以用实拍，也可尝试让商品照片动起来。<br>价格画面：直接排文字，不需要 AI 凭空画出来。</div></div>
+   <div class="explain-block"><span class="label">AI 怎么帮，优势是什么</span><p>主要有三种方式：从已有视频里挑出合适片段；根据文字生成新画面；根据照片生成动态画面。最后一种常叫<strong>图生视频</strong>，意思就是“图片变成视频片段”。生成可以补充缺少的画面；实拍更方便保留真实商品细节。</p></div>
+   <div class="explain-block pitfall"><span class="label">容易出什么问题</span><p>生成后，杯盖可能变成另一种形状，下一镜的绿色也可能变了。这就是常说的<strong>一致性问题</strong>：前后是否还是同一个东西。</p></div>
+   <details><summary>想多了解：几种生成方法有什么区别</summary><p><strong>文生视频：</strong>只用文字描述想要的画面，准备少，但外观细节不一定准确。</p><p><strong>图生视频：</strong>先给一张照片，帮助固定商品样子，但运动时仍可能变形。</p><p><strong>参考生视频：</strong>给人物、商品或场景参考材料，让生成结果尽量沿用这些特征；仍需检查。</p><p><strong>首尾帧：</strong>指定开始和结束两张画面，让 AI 补中间过程。“帧”就是视频中的一张静态画面。</p><p class="related">官方能力参考：<a href="https://docs.volcengine.com/docs/ark/create-video-generation-task-api?lang=zh&amp;redirect=1">Seedance</a><a href="https://help.aliyun.com/zh/model-studio/wan3-video-generation-api-reference">万相</a><a href="https://platform.vidu.cn/docs/function-list">Vidu</a>。此处说明方法，不做效果排名。</p></details>
+  </article>
+  <article class="step-panel" id="step-3" aria-labelledby="step-title-3">
+   <div class="step-index">第 4 步 / 共 6 步</div><h3 class="step-title" id="step-title-3">让观众听懂：配音、音乐与声音</h3>
+   <div class="explain-block"><span class="label">为什么需要这一步</span><p>画面不一定能说明容量和价格。解说可以补充信息，音乐和环境声音可以帮助表达气氛。不过，只需要字幕的视频也可以不配解说。</p></div>
+   <div class="explain-block"><span class="label">放到保温杯例子里</span><div class="sample">让 AI 读出“这款杯子容量 500 毫升，售价 79 元”，再试听是否读对、语速是否合适。</div></div>
+   <div class="explain-block"><span class="label">AI 怎么帮，优势是什么</span><p>输入文字就能生成朗读音频，这叫<strong>语音合成</strong>。修改一句话后可以重新生成，减少重复录音。有的模型也能同时生成画面和声音。</p></div>
+   <div class="explain-block pitfall"><span class="label">容易出什么问题</span><p>品牌名可能读错，一段话可能太长，塞不进对应画面。若画面里有人讲话，还要让嘴巴动作对得上声音，这叫<strong>口型同步</strong>。</p></div>
+   <details><summary>想多了解：数字人是什么，是否一定需要</summary><p><strong>数字人</strong>在这类工具中通常指可以通过文字或声音驱动的虚拟出镜人物。它适合讲解、播报等形式，但并不是每条视频都需要一个人站在镜头前。</p><p class="related">组件与服务：<a href="https://github.com/QwenAudio/CosyVoice">CosyVoice</a>用于语音生成；<a href="https://github.com/TMElyralab/MuseTalk">MuseTalk</a>用于口型同步；<a href="https://mcp.chanjing.cc/faq/basics.html">蝉镜</a>提供数字人合成服务。功能与使用条件以各自说明为准。</p></details>
+  </article>
+  <article class="step-panel" id="step-4" aria-labelledby="step-title-4">
+   <div class="step-index">第 5 步 / 共 6 步</div><h3 class="step-title" id="step-title-4">把零散材料拼成完整视频</h3>
+   <div class="explain-block"><span class="label">为什么需要这一步</span><p>四段画面和一段配音分开放着，还不是成片。要决定它们的先后顺序、各放多久、字幕什么时候出现，这就是<strong>剪辑</strong>。</p></div>
+   <div class="explain-block"><span class="label">放到保温杯例子里</span><div class="sample">先放桌面展示，再放携带和杯盖细节，最后显示“500 毫升 · 79 元”；让配音说到价格时，字幕同步出现。</div></div>
+   <div class="explain-block"><span class="label">AI 怎么帮，优势是什么</span><p>工具可以按计划拼接画面、生成字幕、调整尺寸。固定样式可以反复使用：换一个商品，只替换照片、文案和价格，节省重复编辑。</p></div>
+   <div class="explain-block pitfall"><span class="label">容易出什么问题</span><p>画面切换太快，字幕挡住商品，或者讲杯盖时还在播放背包镜头。自动拼接可以完成机械操作，但“看着顺不顺、讲得清不清”还需要判断。</p></div>
+   <details><summary>想多了解：开发者如何自动剪辑</summary><p>剪辑软件中的<strong>时间线</strong>，可以理解为一张按秒安排画面和声音的日程表。程序也能生成这张安排，再按安排输出视频。</p><p class="related"><a href="https://www.capcut.cn/">剪映</a>面向直接制作；<a href="https://ffmpeg.org/ffmpeg.html">FFmpeg</a>和 <a href="https://www.remotion.dev/docs/">Remotion</a>可供开发者做程序化视频处理。它们的作用与“生成新画面的 AI”不同。</p></details>
+  </article>
+  <article class="step-panel" id="step-5" aria-labelledby="step-title-5">
+   <div class="step-index">第 6 步 / 共 6 步</div><h3 class="step-title" id="step-title-5">确认做对，再交给用户或发布</h3>
+   <div class="explain-block"><span class="label">为什么需要这一步</span><p>片子能正常播放，不代表已经可用。交付前要确认内容正确、画面符合要求，而且客户能提出修改意见。</p></div>
+   <div class="explain-block"><span class="label">放到保温杯例子里</span><div class="sample">杯子是否始终同款？容量和价格是否正确？声音清楚吗？字幕是否遮挡？如果价格改为 69 元，能否只更新价格，而不用全部重做？</div></div>
+   <div class="explain-block"><span class="label">AI 怎么帮，优势是什么</span><p>程序可以检查分辨率和时长，AI 可以辅助检查字幕、声音或画面问题。把检查提前，可以减少错误流到客户手里。</p></div>
+   <div class="explain-block pitfall"><span class="label">容易出什么问题</span><p>AI 未必能识别出细微的商品错误，也不知道客户喜欢什么风格。人工确认仍然重要；修改某一处会不会牵连其他内容，也很影响使用体验。</p></div>
+   <details><summary>想多了解：发布后，自动化还包括什么</summary><p>一些系统还会协助发布，再观察观看和转化情况，用于下一次制作。但不同平台的发布权限和数据范围不同，不能默认都能完全自动操作。</p><p>制作时还需要确认素材、人物和声音的使用授权，并处理适用的 AI 内容标识要求。</p><p class="related">依据：<a href="https://developer.open-douyin.com/capacity-center-page/capacity-detail/7180322911280955447">抖音发布能力</a><a href="https://www.cac.gov.cn/2025-03/14/c_1743654684782215.htm">生成合成内容标识办法</a>。详细工程和授权边界见原始详版。</p></details>
+  </article>
+  <div class="step-controls"><button id="previous" type="button" disabled>上一步</button><span class="step-count" id="step-status" aria-live="polite">正在阅读第 1 / 6 步</span><button id="next" class="next" type="button">下一步</button></div>
+ </div>
+ <div class="takeaway"><p>先决定讲什么，再安排画面，准备画面与声音，最后剪辑和检查。<strong>这些工作连起来，就是“视频生产工作流”。</strong></p></div>
+ <p class="small">画面和声音可以同时准备；检查发现错误后可以返回前面修改。这六步是理解框架，不是必须严格按顺序执行的流水线。</p>
+</section>
+
+<section id="tools">
+ <div class="section-label">理解过程之后，再认识工具</div><h2>先分清三种工具，名字以后再记</h2>
+ <div class="tool-group"><div class="tool-level">第一类 · 帮你直接做视频</div><h3>像一个已经装好的工作台</h3><p>你在里面写内容、准备画面、剪辑和修改。它可能把前面几步包在一起。</p><p><span class="tool-name">例子：剪映、即创、Seko。</span>它们覆盖范围不同，不代表每一个都能完成所有视频任务。</p><p class="small">适合先体验：使用者到底需要提供什么，自动完成后还要改哪里。</p></div>
+ <div class="tool-group"><div class="tool-level">第二类 · 提供某一种生成能力</div><h3>像负责制作画面的一个工位</h3><p>你给它文字或图片，它生成视频片段。它能出画面，但未必负责整条片子的策划、剪辑和客户修改。</p><p><span class="tool-name">例子：Seedance、万相、可灵、Vidu、海螺。</span>其中一些产品也提供更完整的应用功能，分类只是帮助理解它们在流程中的作用。</p><p class="small"><strong>模型</strong>：可以先理解为完成某种 AI 任务的核心系统。<strong>API</strong>：让你的程序调用这项能力的接口，类似软件之间的“办事窗口”。会用网页，不代表已经能通过程序调用同样功能。</p></div>
+ <div class="tool-group"><div class="tool-level">第三类 · 供开发者研究和搭建</div><h3>像公开的程序与装配方案</h3><p>你可以阅读项目代码，学习别人怎样串起写稿、画面、配音和剪辑，再按许可决定能否修改或商用。</p><p><span class="tool-name">例子：MoneyPrinterTurbo、ViMax、FireRed-OpenStoryline。</span>部分项目接近完整应用，部分只负责一个环节。</p><p class="small"><strong>开源</strong>通常意味着代码按明确许可开放。能看到代码，不自动意味着可以免费商用；模型服务、算力和素材也可能另收费。</p></div>
+ <details><summary>展开查看：现在有哪些软件和项目，分别做什么</summary>
+  <div class="table-wrap"><table class="compare"><thead><tr><th>你要解决什么</th><th>可以研究哪些工具</th><th>先注意什么</th></tr></thead><tbody>
+   <tr><td>直接制作和剪辑</td><td><a href="https://www.capcut.cn/">剪映</a>、<a href="https://support.oceanengine.com/support/content/142192?spaceId=204">即创</a></td><td>自动结果是否适合你的任务，修改是否方便</td></tr>
+   <tr><td>组织故事与镜头</td><td><a href="https://seko.sensetime.com/learn/ai-short-drama">Seko</a>、<a href="https://github.com/HKUDS/ViMax">ViMax</a></td><td>仍需分阶段检查；项目演示不等于稳定交付</td></tr>
+   <tr><td>生成新画面</td><td><a href="https://docs.volcengine.com/docs/ark/create-video-generation-task-api?lang=zh&amp;redirect=1">Seedance</a>、<a href="https://help.aliyun.com/zh/model-studio/wan3-video-generation-api-reference">万相</a>、<a href="https://ir.kuaishou.com/zh-hans/node/11216/pdf">可灵</a>、<a href="https://platform.vidu.cn/docs/function-list">Vidu</a>、<a href="https://solutions.minimaxi.com/debug/video">MiniMax</a></td><td>网页与程序接口能力可能不同；按具体画面测试</td></tr>
+   <tr><td>数字人口播</td><td><a href="https://mcp.chanjing.cc/faq/basics.html">蝉镜</a></td><td>人物、声音授权与实际合成效果</td></tr>
+   <tr><td>研究完整短视频流程</td><td><a href="https://github.com/harry0703/MoneyPrinterTurbo">MoneyPrinterTurbo</a></td><td>结果依赖外部素材和模型服务</td></tr>
+   <tr><td>用对话操作剪辑</td><td><a href="https://github.com/FireRedTeam/FireRed-OpenStoryline">FireRed-OpenStoryline</a></td><td>适用素材和可修改范围</td></tr>
+   <tr><td>实验、自部署生成</td><td><a href="https://github.com/Comfy-Org/ComfyUI">ComfyUI</a>、<a href="https://github.com/Wan-Video/Wan2.2">Wan2.2</a></td><td>更像开发工具；需要算力与维护</td></tr>
+   <tr><td>研究短剧工作台</td><td><a href="https://github.com/chatfire-AI/huobao-drama">火宝短剧</a></td><td>公开源码但许可含非商业限制，商用需确认</td></tr>
+  </tbody></table></div><p class="related">以上仅为代表性供给，不是市场份额或效果排名。<a href="AI视频自动化调研报告_2026-11-24.html#opensource">原始详版包含更多组件与许可说明</a>。</p>
+ </details>
+ <div class="takeaway"><p>对你这样的开发者：既可以使用现成工具，也可以通过接口购买 AI 能力，再围绕某类用户的任务做产品。</p></div>
+</section>
+
+<section id="markets">
+ <div class="section-label">不要只按“能生成什么”看市场</div><h2>不同用户，最怕的错误不一样</h2>
+ <div class="decision"><h3>卖商品的人：最怕商品被做错</h3><p>画面漂亮，但杯盖变了、价格错了，就不能用。需要的是准确展示、快速改价格、反复制作不同版本。</p></div>
+ <div class="decision"><h3>讲知识、教操作的人：最怕讲错或对不上</h3><p>配音说“点击导出”，画面却还停在登录页，观众就跟不上。需要的是资料准确、讲解与画面对应、更新方便。</p></div>
+ <div class="decision"><h3>做故事、短剧的人：最怕前后接不上</h3><p>同一个角色下一镜换了脸，或者对白与动作不一致，会影响观看。需要的是人物稳定、镜头连贯和方便重做。</p></div>
+ <div class="decision"><h3>有长视频的人：最怕剪掉上下文</h3><p>一句话看起来精彩，但脱离前后内容后意思变了。需要的是选出能独立讲清楚的片段，再加字幕和包装。</p></div>
+ <p class="small">这里归纳的是任务差异，尚不代表这些用户已经愿意付费。本地商家、企业、教育等场景的横向比较保留在<a href="AI视频自动化调研报告_2026-11-24.html#scenarios">原始详版</a>，可以熟悉流程后再看。</p>
+</section>
+
+<section id="opportunities">
+ <div class="section-label">现在再谈产品机会</div><h2>小团队可以先找“具体哪一步还很费力”</h2>
+ <p>“别人能生成视频，我也能接一个生成接口”，还不足以说明产品有价值。更有用的问题是：用户现在怎样完成任务，哪一步让他反复花时间，你能不能明显改善？</p>
+ <article class="opportunity"><span class="tag">候选方向一 · 企业讲解</span><h3>让说明资料和录屏，变成讲解视频</h3><p><strong>用户的麻烦：</strong>软件更新后，要改讲解稿、重新配音、找到对应录屏，再剪一次。</p><p><strong>产品可以帮助：</strong>让文字对应到正确录屏；更新一个步骤时只修改相关部分；交付前让客户逐段确认。</p><p><strong>为什么可考虑：</strong>容易看出讲得对不对、有没有省时间，适合发挥资料处理和程序开发能力。</p><p class="question"><strong>必须先问：</strong>用户多久更新一次？现在耗时多少？他真的需要视频，还是一篇图文说明已经够用？</p></article>
+ <article class="opportunity"><span class="tag">候选方向二 · 特定品类的商品视频</span><h3>让真实商品素材，更容易反复制作和修改</h3><p><strong>用户的麻烦：</strong>照片和片段散在各处，不同商品容易混淆；改一次价格，还要逐条找视频修改。</p><p><strong>产品可以帮助：</strong>把每件商品的资料和素材对应好，按固定格式制作，并集中更新需要变化的内容。</p><p><strong>为什么可考虑：</strong>可以用同一批素材比较新旧做法，测量实际节省的工作。</p><p class="question"><strong>必须先问：</strong>剪映、即创等现有工具是否已经足够？你的改进能否让客户愿意付费，而不仅是觉得方便？</p></article>
+ <p class="small"><strong>这是两个待验证方向，不是已确认的市场空白。</strong>我们目前只确认你有开发能力，还没有真实客户访谈与付费证据。</p>
+ <details><summary>另一个候选：帮助短剧团队少返工</summary><p>例如记录哪个镜头用了哪个角色参考图，重做失败片段时保留其他结果，比较候选画面，记录花了多少钱。</p><p>这类功能已有项目在做。火宝短剧发布记录里就有任务恢复等改进。因此应寻找某类团队具体还没解决的问题，而不是笼统做“短剧管理平台”。</p><p class="related"><a href="https://github.com/chatfire-AI/huobao-drama/releases">火宝短剧发布记录</a></p></details>
+ <h3>怎样判断是不是真的省钱</h3>
+ <p>不要只看生成一次多少钱。<strong>还要算试了多少次、人工改了多久，最终做出了几条能用的视频。</strong></p>
+ <div class="sample">纯演示算例，非厂商报价：每次生成 2 元，试 5 次才得到一个可用片段，生成成本就是 10 元；还没有计入配音、剪辑和人工修改。</div>
+ <h3>最小的下一步：观察一次真实制作</h3>
+ <p>找一个正在做视频的人，请他拿出原始资料、成片和修改记录。用现成工具完成同样任务，记录总耗时、人工修改时间和花费，再判断有没有值得单独解决的问题。</p>
+ <div class="end"><p><strong>现阶段先带走这一点：</strong></p><p>理解“视频怎样做成”之后，再找具体用户做起来最费力的地方。你不必先造出整套平台，才能验证一个产品机会。</p></div>
+</section>
+
+<section id="glossary" class="glossary">
+ <div class="section-label">用到时再查</div><h2>名词小词典</h2>
+ <details><summary>脚本、分镜、镜头，有什么区别？</summary><p>脚本决定整条视频讲什么；分镜安排每一段具体出现什么画面、持续多久；镜头是一段连续画面。相当于先有内容稿，再有拍摄或生成的安排表。</p></details>
+ <details><summary>素材、资产，是什么意思？</summary><p>素材是拿来制作的照片、视频、声音等原材料。“资产”常用来指被保存、整理并能反复使用的材料，例如某个角色的参考图、商品图片和品牌模板。先理解成“整理好的可复用材料”即可。</p></details>
+ <details><summary>模型和 API，是什么关系？</summary><p>模型是执行 AI 任务的核心系统；API 是软件调用它的接口。你的网站可以通过接口发出“根据这张图生成片段”的请求，再拿到结果。服务通常有自己的费用、权限和使用限制。</p></details>
+ <details><summary>提示词，是什么意思？</summary><p>就是写给 AI 的要求。例如“保持杯子外观，镜头缓慢靠近，不要增加文字”。写清要求有帮助，但不保证生成结果一定照做。</p></details>
+ <details><summary>工作流和自动化，是什么意思？</summary><p>工作流是一件事从开始到完成的步骤安排。自动化是让软件完成其中一部分或多部分，减少人工操作。它可以仍然包含人工检查，并不一定全程无人参与。</p></details>
+ <details><summary>开源、自部署，是什么意思？</summary><p>开源项目按许可开放代码。自部署是把程序或模型运行在自己管理的电脑、服务器上，而不是完全使用厂商网页。自部署仍有硬件、维护和许可成本。</p></details>
+ <details><summary>数字人、语音合成、口型同步，有什么区别？</summary><p>数字人是虚拟出镜形象；语音合成把文字变成声音；口型同步让嘴巴动作对上声音。这些能力可以组合，也可以只用其中一项。</p></details>
+ <details><summary>一致性、质检、返工，分别指什么？</summary><p>一致性是同一人物或商品在前后镜头里是否仍保持相同特征；质检是检查视频是否符合要求；返工是发现问题后重新制作或修改。</p></details>
+</section>
+
+<section id="sources">
+ <div class="section-label">需要进一步研究时再打开</div><h2>资料与完整详版</h2>
+ <p>这次主要改了讲解顺序和表达方式，沿用前一版已经核查的资料，没有重新做一轮市场调研。案例、算例和图示均为教学用途。</p>
+ <p><a href="AI视频自动化调研报告_2026-11-24.html">打开原始详版：完整流程表、软件与开源项目比较、成本与工程边界、来源索引</a></p>
+ <details><summary>展开查看：入门版主要事实来源</summary><ul class="source-list">
+  <li><a href="https://www.capcut.cn/">剪映官网</a>：剪辑、字幕、配音、数字人等功能。</li>
+  <li><a href="https://support.oceanengine.com/support/content/142192?spaceId=204">即创产品能力手册</a>：智能成片与数字人成片。</li>
+  <li><a href="https://seko.sensetime.com/learn/ai-short-drama">Seko 创作指南</a>：分阶段规划、生成和检查。</li>
+  <li><a href="https://docs.volcengine.com/docs/ark/create-video-generation-task-api?lang=zh&amp;redirect=1">火山方舟视频生成接口</a>、<a href="https://help.aliyun.com/zh/model-studio/wan3-video-generation-api-reference">万相接口</a>、<a href="https://platform.vidu.cn/docs/function-list">Vidu 功能清单</a>：生成方式及输入能力。</li>
+  <li><a href="https://github.com/harry0703/MoneyPrinterTurbo">MoneyPrinterTurbo</a>、<a href="https://github.com/HKUDS/ViMax">ViMax</a>、<a href="https://github.com/FireRedTeam/FireRed-OpenStoryline">FireRed-OpenStoryline</a>：流程与剪辑编排。</li>
+  <li><a href="https://github.com/chatfire-AI/huobao-drama/blob/master/LICENSE">火宝短剧许可</a>、<a href="https://github.com/chatfire-AI/huobao-drama/releases">发布记录</a>：使用边界及已有功能。</li>
+  <li><a href="https://www.remotion.dev/docs/">Remotion</a>、<a href="https://ffmpeg.org/ffmpeg.html">FFmpeg</a>：程序化视频制作和处理。</li>
+  <li><a href="https://developer.open-douyin.com/capacity-center-page/capacity-detail/7180322911280955447">抖音开放平台</a>、<a href="https://www.cac.gov.cn/2025-03/14/c_1743654684782215.htm">国家网信办标识办法</a>：发布权限和内容标识。</li>
+ </ul></details>
+</section>
+<footer>国内市场 · 面向有开发能力的个人与小团队<br>公开资料能够说明功能供给，不能替代实际试用、客户访谈和付费验证。<br>正文、样式与交互均在本文件中，离线可读；外部资料链接需要网络。</footer>
+</main>
+<script>
+(function(){
+ 'use strict';
+ var lesson=document.getElementById('lesson');
+ var panels=Array.from(lesson.querySelectorAll('.step-panel'));
+ var buttons=Array.from(lesson.querySelectorAll('[data-step]'));
+ var previous=document.getElementById('previous');
+ var next=document.getElementById('next');
+ var status=document.getElementById('step-status');
+ var current=0;
+ function selectStep(index){
+  current=Math.max(0,Math.min(panels.length-1,index));
+  panels.forEach(function(panel,i){panel.classList.toggle('is-active',i===current);panel.setAttribute('aria-hidden',i===current?'false':'true');});
+  buttons.forEach(function(button,i){button.setAttribute('aria-pressed',i===current?'true':'false');});
+  previous.disabled=current===0;
+  next.disabled=current===panels.length-1;
+  status.textContent='正在阅读第 '+(current+1)+' / '+panels.length+' 步';
+ }
+ buttons.forEach(function(button){button.addEventListener('click',function(){selectStep(Number(button.getAttribute('data-step')));});});
+ previous.addEventListener('click',function(){selectStep(current-1);});
+ next.addEventListener('click',function(){selectStep(current+1);});
+ lesson.classList.add('enhanced');
+ selectStep(0);
+ var disclosureStates=[];
+ function preparePrint(){
+  disclosureStates=Array.from(document.querySelectorAll('details')).map(function(detail){var state={element:detail,open:detail.open};detail.open=true;return state;});
+  panels.forEach(function(panel){panel.setAttribute('aria-hidden','false');});
+ }
+ function finishPrint(){disclosureStates.forEach(function(state){state.element.open=state.open;});disclosureStates=[];selectStep(current);}
+ window.addEventListener('beforeprint',preparePrint);
+ window.addEventListener('afterprint',finishPrint);
+ document.getElementById('print').addEventListener('click',function(){window.print();});
+})();
+</script>
+</body>
+</html>

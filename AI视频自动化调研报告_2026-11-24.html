@@ -1,0 +1,250 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="AI 视频自动化全流程、技术方法、软件与开源项目，以及面向国内市场的个人和小团队产品机会调研。">
+<title>AI 视频自动化调研报告 · 2026.11.24</title>
+<style>
+:root{--ink:#192b3b;--muted:#607180;--accent:#cf4d27;--line:#dce3e8;--paper:#fff;--bg:#f3f6f8;--nav:#122534;--soft:#eaf1f5;--green:#1b685b;--radius:14px;scroll-behavior:smooth;scroll-padding-top:30px}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.85 "Microsoft YaHei","PingFang SC",system-ui,sans-serif}a{color:#176180;text-decoration-thickness:1px;text-underline-offset:4px}a:hover{color:var(--accent)}button{font:inherit;cursor:pointer}::selection{background:#ffd7c7}aside{position:fixed;inset:0 auto 0 0;width:260px;padding:35px 24px;background:var(--nav);color:#fff;overflow-y:auto;z-index:5}.brand{font-size:13px;letter-spacing:2px;color:#aabfcf}.nav-title{font-size:23px;line-height:1.5;margin:16px 0 8px}.nav-sub{font-size:14px;color:#aabfcf;line-height:1.8}.nav-line{height:1px;background:#ffffff20;margin:25px 0}nav{display:grid;gap:7px}nav a{color:#bdceda;text-decoration:none;font-size:15px;padding:9px 12px;border-radius:7px;border-left:3px solid transparent}nav a:hover,nav a[aria-current="location"]{background:#ffffff0d;color:#fff;border-left-color:#f38a66}.nav-foot{margin-top:28px;font-size:13px;color:#9bb1c1}.progress{height:3px;background:#ffffff1a;border-radius:5px;margin-top:14px}.progress span{display:block;width:0;height:100%;background:#f38a66}.shell{margin-left:260px}.toolbar{display:flex;justify-content:space-between;align-items:center;gap:16px;padding:17px 5%;border-bottom:1px solid var(--line);font-size:14px;color:var(--muted)}.print{border:1px solid #ccd6de;background:white;color:var(--ink);border-radius:7px;padding:6px 14px;font-size:14px}.print:hover{border-color:var(--accent);color:var(--accent)}main{max-width:1160px;padding:0 5% 70px;margin:auto}.hero{padding:65px 0 35px}.eyebrow{font-size:14px;letter-spacing:2px;color:var(--accent);font-weight:700}h1{font-size:clamp(34px,4.4vw,57px);letter-spacing:-1.5px;line-height:1.3;margin:20px 0}.subtitle{font-size:20px;color:var(--muted);max-width:740px;line-height:1.8}.tags{display:flex;flex-wrap:wrap;gap:9px;margin:25px 0}.tag{font-size:13px;background:#e7edf1;border:1px solid #d9e2e8;padding:3px 11px;border-radius:99px}.thesis{background:var(--nav);color:#f4f8fb;padding:27px 32px;border-radius:var(--radius);margin:24px 0}.thesis p{margin:8px 0;font-size:20px;line-height:1.8}.thesis .label{font-size:13px;color:#f6a58b;letter-spacing:2px}.note{border-left:3px solid #9fb5c5;padding:5px 0 5px 18px;color:var(--muted);font-size:15px;margin:22px 0}.section{margin-top:54px;scroll-margin-top:25px}.section-head{border-top:2px solid var(--ink);padding-top:20px;margin-bottom:25px}.kicker{font-size:13px;letter-spacing:2px;color:var(--accent);font-weight:bold}h2{font-size:29px;line-height:1.45;margin:7px 0 0}h3{font-size:21px;line-height:1.6;margin:29px 0 12px}p{margin:13px 0}strong{font-weight:700}ul,ol{padding-left:1.5em}li{margin:8px 0}.table-wrap{overflow:auto;border:1px solid var(--line);border-radius:11px;margin:22px 0;background:white}table{border-collapse:collapse;width:100%;min-width:650px;text-align:left;font-size:15px;line-height:1.8}th{background:#eaf0f4;font-weight:700;color:#344e62}th,td{padding:15px 17px;border-bottom:1px solid var(--line);vertical-align:top}tr:last-child td{border-bottom:0}tbody tr:hover{background:#f9fbfc}td:first-child{font-weight:600;min-width:125px}.sources-inline{font-size:14px;color:var(--muted);line-height:2}.sources-inline a{margin-right:12px}.flow{background:white;border:1px solid var(--line);border-radius:var(--radius);padding:27px;margin:25px 0}.flow-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.flow-step{background:var(--soft);border:1px solid #dce7ee;padding:15px;border-radius:8px}.flow-step b{display:block;font-size:16px}.flow-step span{display:block;font-size:13px;color:var(--muted);margin-top:4px}.flow-step .step-no{font-size:12px;color:var(--accent);font-weight:700;margin:0 0 4px}.flow-caption{font-size:14px;color:var(--muted);margin-bottom:0}.levels{display:grid;grid-template-columns:repeat(3,1fr);gap:15px;margin:24px 0}.level{background:white;padding:20px;border:1px solid var(--line);border-radius:11px}.level b{font-size:17px}.level p{font-size:15px;color:var(--muted);margin-bottom:0}.opportunity{background:white;border:1px solid var(--line);border-radius:var(--radius);padding:26px 30px;margin:22px 0}.opportunity h3{margin-top:10px;font-size:23px}.badge{font-size:13px;color:var(--green);background:#e8f4ef;border-radius:5px;display:inline-block;padding:2px 9px}.hypothesis{background:#fff3eb;border-left:3px solid var(--accent);padding:12px 16px;font-size:15px}.formula{background:var(--soft);padding:23px 27px;border-radius:10px;font-size:18px;font-weight:600;line-height:1.9;margin:23px 0}.action{background:var(--nav);color:#eef5fa;border-radius:var(--radius);padding:25px 30px;margin-top:27px}.action strong{color:#ffb297}.action p{margin:5px 0}.source-list{list-style:none;padding:0;margin:0}.source-list li{padding:13px 0;border-bottom:1px solid var(--line);font-size:15px}.source-list small{display:block;color:var(--muted);font-size:13px}details{background:white;border:1px solid var(--line);border-radius:10px;padding:17px 22px;margin:14px 0}summary{font-weight:600;cursor:pointer}footer{font-size:13px;line-height:1.8;color:var(--muted);border-top:1px solid var(--line);padding-top:22px;margin-top:50px}.back-top{display:inline-block;margin-top:15px}.skip{position:fixed;left:280px;top:-80px;background:#fff;padding:10px;z-index:20}.skip:focus{top:10px}:focus-visible{outline:3px solid #ec8a5d;outline-offset:4px}
+@media(min-width:1500px){main{padding-left:60px;padding-right:60px}.toolbar{padding-left:60px;padding-right:60px}}
+@media(max-width:1050px){aside{width:220px;padding:28px 18px}.shell{margin-left:220px}.nav-title{font-size:21px}main{padding-left:5%;padding-right:5%}.flow-grid{grid-template-columns:repeat(2,1fr)}h1{font-size:43px}.levels{gap:10px}.level{padding:16px}}
+@media(max-width:760px){body{font-size:16px}aside{position:relative;width:auto;padding:22px 20px}.brand,.nav-sub,.nav-line,.nav-foot{display:none}.nav-title{font-size:20px;margin:0 0 14px}nav{display:flex;overflow-x:auto;gap:5px;padding-bottom:3px}nav a{white-space:nowrap;font-size:14px;padding:6px 10px;border-left:0;border-bottom:2px solid transparent}nav a[aria-current="location"]{border-bottom-color:#f38a66}.shell{margin-left:0}.toolbar{padding:12px 20px;font-size:13px}.print{font-size:13px;white-space:nowrap}main{padding:0 20px 40px}.hero{padding:35px 0 15px}h1{font-size:36px}.subtitle{font-size:18px}.thesis{padding:21px}.thesis p{font-size:18px}.levels{grid-template-columns:1fr}.flow{padding:16px}.flow-grid{gap:8px}.flow-step{padding:11px}.flow-step b{font-size:15px}.section{margin-top:38px}h2{font-size:25px}.opportunity{padding:21px}.skip{left:20px}}
+@media print{@page{size:A4;margin:16mm 13mm}body{font-size:10.5pt;line-height:1.65;background:white;color:#111}aside,.toolbar,.back-top,.skip{display:none}.shell{margin:0}main{max-width:none;padding:0}.hero{padding-top:0}h1{font-size:29pt}h2{font-size:19pt}h3{font-size:13pt}.subtitle{font-size:13pt}.section{margin-top:25px}.section-head{break-after:avoid}.table-wrap{overflow:visible;border-radius:0}table{min-width:0;font-size:9pt}th,td{padding:7px 8px}tr,.opportunity,.level,.flow-step{break-inside:avoid}.thesis,.action{background:#eef2f5;color:#111;border:1px solid #bccbd5}.thesis p{font-size:13pt}.thesis .label,.action strong{color:#983d20}.flow,.opportunity{padding:15px}.sources-inline{font-size:9pt}a{color:#154c68}details{border:0;padding:0}details>summary{display:none}details>*{display:block}.source-list li{font-size:9pt}.source-list small{font-size:8pt}.note{font-size:10pt}footer{font-size:8pt}}
+</style>
+</head>
+<body>
+<a href="#main" class="skip">跳到报告正文</a>
+<aside aria-label="报告目录">
+ <div class="brand">RESEARCH / NOV 2026</div>
+ <div class="nav-title">AI 视频自动化<br>调研报告</div>
+ <div class="nav-sub">从生产链路到产品机会<br>国内市场 · 个人与小团队</div>
+ <div class="nav-line"></div>
+ <nav>
+  <a href="#overview" aria-current="location">报告概览</a><a href="#workflow">宏观流程与制作路线</a><a href="#methods">环节方法与痛点</a><a href="#products">软件与模型服务</a><a href="#opensource">开源与公开源码项目</a><a href="#scenarios">应用场景比较</a><a href="#opportunities">值得验证的产品机会</a><a href="#economics">交付成本与工程边界</a><a href="#validation">下一步验证路线</a><a href="#sources">资料来源</a>
+ </nav>
+ <div class="nav-foot">基于公开资料的案头调研<div class="progress" aria-hidden="true"><span id="progress"></span></div><span id="reading-status">阅读进度 0%</span></div>
+</aside>
+<div class="shell">
+ <div class="toolbar"><span>调研日期：2026 年 11 月 24 日</span><button class="print" type="button" id="print-button">打印 / 保存 PDF</button></div>
+ <main id="main">
+  <header class="hero" id="overview">
+   <div class="eyebrow">行业认知与产品机会研究</div>
+   <h1>AI 视频自动化<br>从生产链路到产品机会</h1>
+   <p class="subtitle">理解每个环节如何实现、优势与痛点在哪里，再判断个人或小团队值得从哪里切入。</p>
+   <div class="tags"><span class="tag">国内市场优先</span><span class="tag">横向比较主要场景</span><span class="tag">面向有开发能力的小团队</span><span class="tag">技术与商业判断分开</span></div>
+   <div class="thesis"><div class="label">核心判断</div><p>更值得寻找的机会，是帮助某类用户稳定完成视频生产中的具体任务，并减少返工和交付成本。</p></div>
+   <p>通用的视频生成、配音、数字人和自动剪辑已有较多供给。机会判断需要进一步落到：谁在持续制作什么视频、现有工具在哪一步不好用，以及改进后能否带来可衡量的收益。</p>
+   <div class="note"><strong>研究范围与证据边界。</strong>先建立整体认知，再寻找国内市场的产品机会，优先考虑利用现有模型和开源项目切入。本报告整理自前述聊天报告，依据截至 2026 年 11 月 24 日核查的官方文档、产品页面和项目仓库；未对全部产品进行实测，也未进行客户访谈。下文的机会排序、适合度和建议属于分析判断，不能当作已验证的市场结论。</div>
+  </header>
+
+  <section class="section" id="workflow">
+   <div class="section-head"><div class="kicker">生产链路</div><h2>AI 视频自动化是一条生产链</h2></div>
+   <p>从需求到发布，大致需要经过下面这些环节。配音和画面制作可以并行；质检不合格时，需要返回脚本、素材或剪辑环节修改。</p>
+   <div class="flow" aria-label="视频生产流程，按序号从左到右阅读">
+    <div class="flow-grid">
+     <div class="flow-step"><span class="step-no">01</span><b>目标与输入材料</b><span>受众、用途、要求、原始资料</span></div>
+     <div class="flow-step"><span class="step-no">02</span><b>选题与资料整理</b><span>信息检索、事实整理、内容方向</span></div>
+     <div class="flow-step"><span class="step-no">03</span><b>脚本与分镜计划</b><span>镜头、时长、对白、素材来源</span></div>
+     <div class="flow-step"><span class="step-no">04</span><b>资产准备</b><span>角色、商品、场景、品牌规范</span></div>
+     <div class="flow-step"><span class="step-no">05</span><b>画面与声音制作</b><span>素材检索、生成、配音与音效</span></div>
+     <div class="flow-step"><span class="step-no">06</span><b>剪辑与包装</b><span>时间线、字幕、标题、音乐</span></div>
+     <div class="flow-step"><span class="step-no">07</span><b>质检与人工确认</b><span>事实、外观、音画、连贯性</span></div>
+     <div class="flow-step"><span class="step-no">08</span><b>导出与发布</b><span>平台规格、权限与授权</span></div>
+     <div class="flow-step"><span class="step-no">09</span><b>反馈与优化</b><span>效果数据、修改与下一轮制作</span></div>
+    </div>
+    <p class="flow-caption">返工回路：质检发现问题后，按原因返回脚本、素材或剪辑环节；效果反馈用于下一轮策划。单个片段生成，只覆盖其中一部分。</p>
+   </div>
+   <div class="table-wrap"><table><thead><tr><th>制作路线</th><th>实际做法</th><th>适合的任务</th><th>主要限制</th></tr></thead><tbody>
+    <tr><td>真实素材驱动</td><td>理解、筛选和剪辑已有实拍、录屏、图片、直播录像</td><td>商品展示、口播、课程切片、企业介绍</td><td>素材质量和覆盖范围决定结果上限</td></tr>
+    <tr><td>生成素材驱动</td><td>根据脚本生成图片、视频、声音，再组装成片</td><td>创意广告、动画、故事短片、短剧</td><td>一致性、精确控制和返工成本</td></tr>
+    <tr><td>混合制作</td><td>真实商品、人物或界面作为主体，生成补充镜头、背景和包装</td><td>营销视频、产品讲解、知识内容</td><td>不同来源素材的风格与节奏协调</td></tr>
+   </tbody></table></div>
+   <p>自动化剪辑也属于这个方向，值得单独研究。剪映提供智能剪口播、解说粗剪、素材搜索、配音和数字人等功能；FireRed-OpenStoryline 则使用自然语言规划和调用剪辑工具。</p>
+   <p class="sources-inline">依据：<a href="https://www.capcut.cn/">剪映官网</a><a href="https://github.com/FireRedTeam/FireRed-OpenStoryline">FireRed-OpenStoryline</a></p>
+   <h3>“自动化”需要区分三个层次</h3>
+   <div class="levels"><div class="level"><b>自动出结果</b><p>任务能跑完，产生一个视频文件。</p></div><div class="level"><b>自动达到可用标准</b><p>画面、事实、字幕和声音基本符合要求。</p></div><div class="level"><b>自动完成业务交付</b><p>客户能修改和确认，结果可追溯，并进入发布或投放流程。</p></div></div>
+   <p>产品宣传中的“一键成片”，需要结合具体任务判断它达到了哪一层。</p>
+  </section>
+
+  <section class="section" id="methods">
+   <div class="section-head"><div class="kicker">方法与瓶颈</div><h2>逐个环节看，如何实现、卡在哪里</h2></div>
+   <div class="table-wrap"><table><thead><tr><th>环节</th><th>常见做法</th><th>优势</th><th>主要痛点</th></tr></thead><tbody>
+    <tr><td>需求与资料整理</td><td>通过表单、对话或文件上传收集目标、受众、商品资料和参考视频；检索补充资料</td><td>将零散输入整理成可处理的任务</td><td>输入缺失、要求模糊；补充资料可能不可靠</td></tr>
+    <tr><td>选题与脚本</td><td>大语言模型结合模板、知识库和历史内容生成文案，再人工修改</td><td>生成与改写快，便于制作多个版本</td><td>同质化、事实错误；文案不好拍；卖点缺乏证据</td></tr>
+    <tr><td>分镜与时间规划</td><td>拆分镜头，定义时长、景别、动作、对白及素材来源</td><td>将创意变成可执行的制作计划</td><td>要求超出模型能力；旁白与画面时长不匹配；缺少节奏</td></tr>
+    <tr><td>资产与一致性</td><td>整理参考图、实拍、声音、品牌规范；使用主体库、多参考图，部分自部署方案使用 LoRA 等定制方法</td><td>复用资产，提高项目内部一致性</td><td>人物、服装和商品细节漂移；版本与授权难管理</td></tr>
+    <tr><td>画面获取与生成</td><td>素材检索、文生视频、图生视频、首尾帧、参考生视频、视频编辑</td><td>按任务选择不同程度的生成和控制</td><td>精确动作、商品细节、复杂交互仍需检查；候选素材未必可用</td></tr>
+    <tr><td>声音制作</td><td>文本转语音、声音克隆、音频驱动口型，或音视频联合生成</td><td>方便修改配音，减少重复录制</td><td>情绪、重音和术语读音不准；多角色声音与口型难统一</td></tr>
+    <tr><td>剪辑与包装</td><td>结构化时间线拼接，生成字幕、转场、标题、音乐及多比例版本</td><td>规则明确，适合程序化与批量制作</td><td>节奏机械；素材与文案不对应；修改影响整条时间线</td></tr>
+    <tr><td>质检与返工</td><td>规则检测、语音识别回查、画面识别、多模态评价与人工确认</td><td>提前发现部分明显错误</td><td>评分与客户审美不一致；发现错误后不一定能准确修复</td></tr>
+    <tr><td>发布与反馈</td><td>导出平台规格、申请发布能力，关联内容版本与效果数据</td><td>连接生产与运营</td><td>平台权限不同、数据不完整、效果难归因</td></tr>
+   </tbody></table></div>
+   <h3>脚本与分镜：从信息到可执行计划</h3>
+   <p>一份实用分镜至少要回答：这一镜说明什么、画面来自哪里、持续多久、说什么、有哪些必须保留的事实。ViMax 等项目已将故事、角色、脚本、分镜和视频生成串联起来，说明编排已有实现基础；流程存在，不代表每次都能得到符合要求的作品。</p>
+   <p>对企业讲解、知识内容和商品视频，更应看重<strong>脚本中的事实能否对应输入资料</strong>。这是产品设计上的判断：价格、尺寸或功能说错，再漂亮的镜头也不能交付。</p>
+   <p class="sources-inline">依据：<a href="https://github.com/HKUDS/ViMax">ViMax 项目</a></p>
+   <h3>画面制作：控制方式已经不止提示词</h3>
+   <div class="table-wrap"><table><thead><tr><th>方法</th><th>如何控制</th><th>优势</th><th>常见代价</th></tr></thead><tbody>
+    <tr><td>文生视频</td><td>描述主体、动作、场景与镜头</td><td>适合探索创意，准备少</td><td>精确外观与细节约束较弱</td></tr>
+    <tr><td>图生视频</td><td>图片固定起始外观，再描述运动</td><td>先确认构图与主体</td><td>运动过程中仍可能变形</td></tr>
+    <tr><td>首尾帧生成</td><td>指定开始与结束画面</td><td>帮助控制转场与状态变化</td><td>中间过程可能不符合预期</td></tr>
+    <tr><td>参考生视频</td><td>提供人物、商品、场景等参考素材</td><td>便于跨镜头复用主体</td><td>一致性仍需逐镜头检查</td></tr>
+    <tr><td>视频编辑／参考视频驱动</td><td>修改已有视频，或参考动作与镜头</td><td>继承部分真实运动与结构</td><td>可修改范围取决于模型和接口</td></tr>
+   </tbody></table></div>
+   <p>核查时，火山方舟文档列出 Seedance 2.5 系列与多模态输入能力；万相 3.0 文档覆盖文生、图生、首尾帧和参考生视频；Vidu 提供参考生视频及主体相关接口。不能继续以早期“只有文生视频、一次几秒钟”的能力描述整个行业。</p>
+   <p class="sources-inline">依据：<a href="https://docs.volcengine.com/docs/ark/create-video-generation-task-api?lang=zh&amp;redirect=1">火山方舟 API</a><a href="https://help.aliyun.com/zh/model-studio/wan3-video-generation-api-reference">万相 3.0 API</a><a href="https://platform.vidu.cn/docs/function-list">Vidu 功能清单</a></p>
+   <h3>声音：独立制作与联合生成并存</h3>
+   <p>独立配音便于改稿、换声音和调整时长；联合生成有助于整体音画表现，但只修改一句话是否方便，需要按模型测试。可复用组件包括语音生成项目 CosyVoice、口型同步项目 MuseTalk，以及商业数字人 API。蝉镜官方文档提供形象定制、声音克隆、文字或音频驱动的视频合成能力。</p>
+   <p class="sources-inline">依据：<a href="https://github.com/QwenAudio/CosyVoice">CosyVoice</a><a href="https://github.com/TMElyralab/MuseTalk">MuseTalk</a><a href="https://mcp.chanjing.cc/faq/basics.html">蝉镜开放平台</a></p>
+   <h3>剪辑：规则适合程序化，审美与业务判断需单独处理</h3>
+   <p>FFmpeg 承担转码、滤镜和音视频处理；Remotion 支持用代码制作、参数化与渲染视频。它们适合稳定执行统一字幕、替换价格、切换横竖版等规则，本身不会判断哪个商品卖点更有说服力。</p>
+   <p class="sources-inline">依据：<a href="https://ffmpeg.org/ffmpeg.html">FFmpeg 文档</a><a href="https://www.remotion.dev/docs/">Remotion 文档</a></p>
+   <h3>质检：围绕业务任务建立验收标准</h3>
+   <p>VBench 提供视频生成质量的多维评估参考；FunASR 提供语音识别等能力，可用于字幕与配音回查。但模型评估分数高，不等于视频符合交付要求。</p>
+   <ul><li><strong>商品视频：</strong>检查包装、数量、型号和价格。</li><li><strong>知识视频：</strong>检查事实、术语和图文对应。</li><li><strong>剧情视频：</strong>检查人物、对白、空间和动作连续性。</li></ul>
+   <p class="sources-inline">依据：<a href="https://github.com/Vchitect/VBench">VBench</a><a href="https://github.com/modelscope/FunASR">FunASR</a></p>
+  </section>
+
+  <section class="section" id="products">
+   <div class="section-head"><div class="kicker">供给地图</div><h2>现有软件与模型服务</h2></div>
+   <p>以下是与调研范围相关的代表性供给，用于理解竞争格局，并非市场份额或效果排名。网页功能、API 功能、套餐与账号权限需要分别核查。</p>
+   <div class="table-wrap"><table><thead><tr><th>软件或服务</th><th>主要覆盖内容</th><th>对产品机会的启示</th></tr></thead><tbody>
+    <tr><td><a href="https://www.capcut.cn/">剪映</a></td><td>剪辑、字幕、配音、数字人、营销成片、生成素材与多种智能工具</td><td>常规编辑提效已有强竞争者，需要具体的输入、流程或交付差异</td></tr>
+    <tr><td><a href="https://support.oceanengine.com/support/content/142192?spaceId=204">即创</a></td><td>营销创作、数字人成片、智能成片</td><td>平台已覆盖营销视频，单纯批量成片较难形成差异</td></tr>
+    <tr><td><a href="https://docs.volcengine.com/docs/ark/create-video-generation-task-api?lang=zh&amp;redirect=1">即梦／Seedance／火山方舟</a></td><td>创作工具及可调用的视频生成能力</td><td>可作为上游能力，应用层需要提供额外价值</td></tr>
+    <tr><td><a href="https://help.aliyun.com/zh/model-studio/wan3-video-generation-api-reference">万相／阿里云百炼</a></td><td>文生、图生、首尾帧与参考生视频 API</td><td>可纳入生成底座候选，按任务验证能力</td></tr>
+    <tr><td><a href="https://ir.kuaishou.com/zh-hans/node/11216/pdf">可灵</a></td><td>视频生成、主体参考、多模态与镜头控制相关能力</td><td>应按具体镜头测试，不能只按展示样片选型</td></tr>
+    <tr><td><a href="https://platform.vidu.cn/docs/model-map">Vidu</a></td><td>文生、图生、参考生及相关音视频能力</td><td>上游也在覆盖应用化功能，需要持续观察扩张范围</td></tr>
+    <tr><td><a href="https://solutions.minimaxi.com/debug/video">海螺／MiniMax</a></td><td>视频生成及开放接口</td><td>纳入候选池，比较质量、成本、延迟与修改能力</td></tr>
+    <tr><td><a href="https://seko.sensetime.com/learn/ai-short-drama">Seko</a></td><td>故事、剧本、主体、分镜与短片制作流程</td><td>短剧工作流已有产品覆盖，机会需要进一步细分</td></tr>
+    <tr><td><a href="https://mcp.chanjing.cc/faq/basics.html">蝉镜</a></td><td>数字人形象、声音定制与视频合成 API</td><td>口播能力可购买，差异可落在业务资料、模板与交付流程</td></tr>
+   </tbody></table></div>
+   <div class="note">Seko 官方指南采用分阶段检查故事、主体与镜头的流程，并提示一次生成不保证得到可直接发布的完整短剧。成熟的产品设计同样需要检查与修改环节。<a href="https://seko.sensetime.com/learn/ai-short-drama">查看官方指南</a></div>
+  </section>
+
+  <section class="section" id="opensource">
+   <div class="section-head"><div class="kicker">开发者资源</div><h2>值得研究的开源与公开源码项目</h2></div>
+   <p>建议按成片应用、流程编排、底层组件三类阅读。以下许可信息以核查时仓库标示为准；依赖、模型权重、字体、音乐及其他资产需要分别确认。</p>
+   <div class="table-wrap"><table><thead><tr><th>项目</th><th>覆盖内容</th><th>值得学习什么</th><th>使用边界</th></tr></thead><tbody>
+    <tr><td><a href="https://github.com/harry0703/MoneyPrinterTurbo">MoneyPrinterTurbo</a></td><td>主题、文案、素材、配音、字幕到成片</td><td>完整短视频流水线和模块替换</td><td>仓库标示 MIT；结果依赖素材与模型服务</td></tr>
+    <tr><td><a href="https://github.com/HKUDS/ViMax">ViMax</a></td><td>故事、角色、分镜、素材生成与组装</td><td>多镜头叙事与资产协调</td><td>仓库标示 MIT；演示不等于生产稳定性证明</td></tr>
+    <tr><td><a href="https://github.com/chatfire-AI/huobao-drama">火宝短剧</a></td><td>剧本、角色、分镜、视频和声音制作</td><td>短剧工作台与任务管理</td><td>当前许可含非商业限制，不能默认用于商业产品</td></tr>
+    <tr><td><a href="https://github.com/FireRedTeam/FireRed-OpenStoryline">FireRed-OpenStoryline</a></td><td>自然语言驱动剪辑、规划与工具调用</td><td>已有素材进入自动剪辑的方式</td><td>仓库标示 Apache-2.0；资产授权另查</td></tr>
+    <tr><td><a href="https://github.com/Comfy-Org/ComfyUI">ComfyUI</a></td><td>节点式模型与素材处理流程</td><td>快速实验图像与视频生成工作流</td><td>属于工具底座，面向普通用户仍需封装</td></tr>
+    <tr><td><a href="https://github.com/Wan-Video/Wan2.2">Wan2.2</a></td><td>自部署文生、图生及相关视频模型</td><td>部署、定制与算力成本</td><td>引入显存、推理速度与运维负担</td></tr>
+    <tr><td><a href="https://github.com/QwenAudio/CosyVoice">CosyVoice</a></td><td>语音生成</td><td>配音与声音定制组件</td><td>核对代码、权重及声音使用条件</td></tr>
+    <tr><td><a href="https://github.com/TMElyralab/MuseTalk">MuseTalk</a></td><td>音频驱动口型同步</td><td>数字人口播相关组件</td><td>不能替代完整人物表演与视频制作系统</td></tr>
+    <tr><td><a href="https://github.com/modelscope/FunASR">FunASR</a></td><td>语音识别及相关处理</td><td>字幕、口播剪辑与回查</td><td>识别结果仍需处理术语和时间轴误差</td></tr>
+   </tbody></table></div>
+   <div class="hypothesis"><strong>选型发现：</strong>火宝短剧虽然公开源码，其当前许可包含非商业限制。可以研究流程；若商业使用，需要按许可和作者授权处理，不能仅凭“GitHub 能下载”判断。<a href="https://github.com/chatfire-AI/huobao-drama/blob/master/LICENSE">查看许可文件</a></div>
+   <p>Remotion 有自己的商业许可规则，核查时页面区分个人及不超过三人的组织与其他组织。技术底座的许可条件应计入选型与成本核算。<a href="https://www.remotion.dev/pricing">Remotion 许可说明</a></p>
+  </section>
+
+  <section class="section" id="scenarios">
+   <div class="section-head"><div class="kicker">需求比较</div><h2>哪些场景更适合小团队</h2></div>
+   <div class="note">本节基于任务特征和现有供给进行分析，尚未通过客户访谈验证。适合度不代表已证实的付费需求。</div>
+   <div class="table-wrap"><table><thead><tr><th>场景</th><th>用户希望获得什么</th><th>主要难点</th><th>切入判断</th></tr></thead><tbody>
+    <tr><td>泛知识、自媒体解说</td><td>持续输出有信息量、有观看价值的内容</td><td>选题、事实、同质化、素材匹配</td><td>泛用成片竞争强；垂直资料与表达规范值得验证</td></tr>
+    <tr><td>电商与广告素材</td><td>快速生产可测试的素材版本</td><td>商品真实、卖点表达、版本管理、效果反馈</td><td>有验证价值，必须证明比平台工具更好</td></tr>
+    <tr><td>本地商家内容</td><td>持续发布与门店真实情况相符的内容</td><td>素材不足、活动更新、运营协作</td><td>容易混入代运营服务，需控制服务成本</td></tr>
+    <tr><td>企业产品讲解</td><td>准确讲清功能、流程与应用价值</td><td>专业资料理解、录屏对齐、修改与审批</td><td>值得优先验证，适合开发与结构化处理能力</td></tr>
+    <tr><td>教育与培训</td><td>把资料变成准确、易理解的视频</td><td>教学设计、更新、术语、图文对应</td><td>可探索重复更新较多的细分任务</td></tr>
+    <tr><td>AI 短剧、动画</td><td>持续交付有吸引力的剧情内容</td><td>叙事、一致性、表演、镜头返工</td><td>整个平台范围大；具体生产辅助工具更适合试切入</td></tr>
+    <tr><td>长视频切片与复用</td><td>从已有内容提取值得传播的片段</td><td>完整语义、上下文、字幕、包装</td><td>容易验证，但已有竞争，需要细分用户</td></tr>
+   </tbody></table></div>
+   <p><strong>优先级应由能否接触并验证用户决定，技术难度只是其中一个因素。</strong>目前已确认开发能力，尚未确认客户资源，因此下面的产品方向均为候选假设。</p>
+  </section>
+
+  <section class="section" id="opportunities">
+   <div class="section-head"><div class="kicker">机会假设</div><h2>优先验证三个方向</h2></div>
+   <article class="opportunity"><span class="badge">优先验证 · 企业讲解</span><h3>资料／录屏转讲解视频</h3><p>面向具体企业任务，例如软件功能演示、设备操作说明、产品更新介绍。用户提供说明文档、录屏和图片，系统生成脚本与时间线，尽量复用真实资料，支持逐段修改。</p><ul><li>重要说明能追溯到资料来源。</li><li>讲解对应正确的界面或操作片段。</li><li>修改一个步骤时，只更新相关片段。</li><li>客户确认后导出，并保留版本记录。</li></ul><p><strong>为什么值得验证：</strong>任务边界较容易明确，正确性相对容易评价。开发工作可集中在资料理解、对齐、局部更新与审核流程。</p><div class="hypothesis"><strong>关键未知：</strong>客户是否真的花较多时间做这些视频？文档与图文教程是否已足够？如果制作频率很低，独立产品可能不成立。</div></article>
+   <article class="opportunity"><span class="badge">优先验证 · 垂直营销</span><h3>特定品类的真实素材营销工作台</h3><p>从一个具体品类开始，例如某类家居用品或工业商品，围绕已有实拍与商品资料制作多个版本。</p><p>可能的价值包括：商品资料绑定、素材标注、卖点与镜头对应、批量更新价格、品牌模板和版本管理。生成模型用于补充确实需要的镜头。</p><p><strong>竞争要求：</strong>需要正面比较剪映、即创和 Vidu 等已有能力。差异必须是具体结果，例如某类商品更少出错、能处理客户现有素材结构、修改和审批更快。更多模板通常不够。</p><div class="hypothesis"><strong>关键未知：</strong>节约的人工时间能否覆盖模型、渲染、客服和素材整理成本？客户是否愿意持续付费？</div></article>
+   <article class="opportunity"><span class="badge">细分探索 · 短剧生产</span><h3>局部返工与任务管理工具</h3><p>候选任务包括角色资产与镜头绑定、候选镜头比较、失败任务恢复、单镜头重做、配音替换、成本记录和制作状态管理。</p><p>不能假定市场没有这些功能。火宝短剧发布记录已经出现任务恢复、续查和重新下载等改进，说明相关需求已有项目关注。更有价值的方式，是寻找某类工作室仍然处理不好的具体任务，测量它造成多少返工。</p><p class="sources-inline">依据：<a href="https://github.com/chatfire-AI/huobao-drama/releases">火宝短剧发布记录</a></p><div class="hypothesis"><strong>关键未知：</strong>工作室是否愿意接入新工具？工具能否融入已有编辑器、资产管理和交付方式？</div></article>
+   <h3>暂时降低优先级的方向</h3>
+   <div class="table-wrap"><table><thead><tr><th>方向</th><th>理由</th></tr></thead><tbody>
+    <tr><td>通用“一句话生成任意完整视频”</td><td>用户任务分散，质量标准难统一，已有广泛供给</td></tr>
+    <tr><td>简单多模型聚合页面</td><td>容易复制，需要证明聚合之外的持续价值</td></tr>
+    <tr><td>仅以便宜为卖点</td><td>成本受上游价格、重试与客服负担影响</td></tr>
+    <tr><td>大量低差异内容生成</td><td>产量不能直接证明内容价值与客户收益</td></tr>
+    <tr><td>自研基础视频大模型</td><td>与当前确认的个人或小团队资源条件不匹配</td></tr>
+   </tbody></table></div>
+   <p>这是切入顺序建议，不意味着这些方向不存在机会。</p>
+  </section>
+
+  <section class="section" id="economics">
+   <div class="section-head"><div class="kicker">成本与交付</div><h2>计算合格交付成本</h2></div>
+   <div class="formula">单条合格视频成本<br>＝（全部候选生成费用＋配音与渲染＋素材费用＋人工检查修改＋存储与交付成本）÷ 合格视频数量</div>
+   <p>假设一个可用镜头平均需要生成四次，应计入四次生成成本。这个数字仅作示例，真实次数需要按模型、镜头类型和验收标准实测。</p>
+   <div class="table-wrap"><table><thead><tr><th>建议记录的指标</th><th>用途</th></tr></thead><tbody>
+    <tr><td>首次产出耗时</td><td>判断用户多久能看到结果</td></tr><tr><td>合格交付耗时</td><td>判断整个流程是否真正提效</td></tr><tr><td>人工修改分钟数</td><td>判断自动化后还剩多少工作</td></tr><tr><td>每条合格视频成本</td><td>判断定价和毛利是否有空间</td></tr><tr><td>真实付费与重复使用</td><td>判断任务是否足够重要、高频</td></tr>
+   </tbody></table></div>
+   <h3>工程上直接影响交付的边界</h3>
+   <p><strong>异步任务与结果留存。</strong>视频生成通常需要提交任务、查询或回调、下载和保存结果。系统应记录状态，避免网络错误时重复生成与付费。火山方舟查询文档明确说明，结果 URL 有效期为 24 小时，需要及时下载或转存。<a href="https://docs.volcengine.com/docs/ark/get-video-generation-task-api?lang=zh">任务查询文档</a></p>
+   <p><strong>发布能力与权限。</strong>抖音开放平台发布涉及应用申请与授权；有发布接口，不代表所有应用和账号都能无人值守发布。<a href="https://developer.open-douyin.com/capacity-center-page/capacity-detail/7180322911280955447">抖音发布能力说明</a></p>
+   <p><strong>授权与内容标识。</strong>国内交付需将素材授权、人物与声音授权，以及适用的生成内容标识要求纳入流程。《人工智能生成合成内容标识办法》于 2025 年 9 月 1 日施行，具体实现需要结合产品服务核查。<a href="https://www.cac.gov.cn/2025-03/14/c_1743654684782215.htm">国家网信办标识办法</a></p>
+  </section>
+
+  <section class="section" id="validation">
+   <div class="section-head"><div class="kicker">验证路线</div><h2>用真实任务筛选机会</h2></div>
+   <p>先选择企业讲解视频与某一品类营销视频两个候选方向，各找到几位正在制作这类视频的人。收集原始资料、现有成片、修改意见和制作耗时，用现成工具完成同样任务，再观察缺口。</p>
+   <ol><li><strong>找高频问题：</strong>哪一步最费时，是否每次发生？</li><li><strong>比较现有工具：</strong>为什么处理不好，是否只是操作不熟练？</li><li><strong>验证付费：</strong>用户愿意付多少钱，是否愿意实际试付？</li><li><strong>验证改进幅度：</strong>能否通过局部产品改进，稳定缩短交付时间？</li></ol>
+   <div class="action"><p><strong>当前建议</strong></p><p>优先验证利用真实资料和素材，帮助某类用户更准确地制作、修改和交付视频。这更容易发挥开发能力，并通过小规模试用判断价值。最终选择企业讲解、营销素材还是短剧辅助，应由真实用户任务决定。</p></div>
+  </section>
+
+  <section class="section" id="sources">
+   <div class="section-head"><div class="kicker">来源索引</div><h2>官方资料与项目仓库</h2></div>
+   <p>正文已在相关判断附近提供链接；这里按类别汇总，方便继续深入。外部页面、产品能力与许可可能在核查日后更新。</p>
+   <details open><summary>软件与模型服务</summary><ul class="source-list">
+    <li><a href="https://www.capcut.cn/">剪映官网</a><small>智能剪辑、配音、数字人和营销相关功能</small></li>
+    <li><a href="https://support.oceanengine.com/support/content/142192?spaceId=204">即创产品能力手册</a><small>数字人成片、智能成片等；部分内容可能需要登录</small></li>
+    <li><a href="https://docs.volcengine.com/docs/ark/create-video-generation-task-api?lang=zh&amp;redirect=1">火山方舟：创建视频生成任务</a><small>模型接入与参数</small></li>
+    <li><a href="https://docs.volcengine.com/docs/ark/get-video-generation-task-api?lang=zh">火山方舟：查询视频生成任务</a><small>任务状态与结果有效期</small></li>
+    <li><a href="https://help.aliyun.com/zh/model-studio/wan3-video-generation-api-reference">阿里云：万相 3.0 视频生成 API</a><small>文生、图生与参考生视频能力</small></li>
+    <li><a href="https://ir.kuaishou.com/zh-hans/node/11216/pdf">快手：可灵 3.0 官方介绍</a><small>PDF，模型能力发布材料</small></li>
+    <li><a href="https://platform.vidu.cn/docs/function-list">Vidu 功能清单</a> / <a href="https://platform.vidu.cn/docs/model-map">模型与功能地图</a><small>生成接口及应用化功能</small></li>
+    <li><a href="https://solutions.minimaxi.com/debug/video">MiniMax 视频 API 示例</a><small>视频生成接口</small></li>
+    <li><a href="https://seko.sensetime.com/learn/ai-short-drama">Seko 短剧创作指南</a><small>分阶段制作和检查流程</small></li>
+    <li><a href="https://mcp.chanjing.cc/faq/basics.html">蝉镜开放平台基础问题</a><small>数字人与声音定制、视频合成</small></li>
+   </ul></details>
+   <details open><summary>开源、公开源码与视频组件</summary><ul class="source-list">
+    <li><a href="https://github.com/harry0703/MoneyPrinterTurbo">MoneyPrinterTurbo</a> / <a href="https://github.com/HKUDS/ViMax">ViMax</a><small>成片流水线与叙事编排</small></li>
+    <li><a href="https://github.com/chatfire-AI/huobao-drama">火宝短剧</a> / <a href="https://github.com/chatfire-AI/huobao-drama/blob/master/LICENSE">许可文件</a> / <a href="https://github.com/chatfire-AI/huobao-drama/releases">发布记录</a><small>工作台、许可边界与任务恢复功能</small></li>
+    <li><a href="https://github.com/FireRedTeam/FireRed-OpenStoryline">FireRed-OpenStoryline</a><small>自然语言驱动剪辑</small></li>
+    <li><a href="https://github.com/Comfy-Org/ComfyUI">ComfyUI</a> / <a href="https://github.com/Wan-Video/Wan2.2">Wan2.2</a><small>工作流与自部署模型</small></li>
+    <li><a href="https://github.com/QwenAudio/CosyVoice">CosyVoice</a> / <a href="https://github.com/TMElyralab/MuseTalk">MuseTalk</a><small>语音生成与口型同步</small></li>
+    <li><a href="https://github.com/modelscope/FunASR">FunASR</a> / <a href="https://github.com/Vchitect/VBench">VBench</a><small>语音回查与视频质量评估</small></li>
+    <li><a href="https://ffmpeg.org/ffmpeg.html">FFmpeg 文档</a> / <a href="https://www.remotion.dev/docs/">Remotion 文档</a> / <a href="https://www.remotion.dev/pricing">Remotion 许可</a><small>视频处理、程序化制作与商业许可</small></li>
+   </ul></details>
+   <details open><summary>平台接入与生成内容标识</summary><ul class="source-list">
+    <li><a href="https://developer.open-douyin.com/capacity-center-page/capacity-detail/7180322911280955447">抖音开放平台：发布内容至抖音</a><small>接入申请与授权边界</small></li>
+    <li><a href="https://www.cac.gov.cn/2025-03/14/c_1743654684782215.htm">国家网信办：《人工智能生成合成内容标识办法》</a><small>生成合成内容标识要求</small></li>
+   </ul></details>
+  </section>
+  <footer>AI 视频自动化调研报告 · 2026 年 11 月 24 日<br>本文件包含完整正文、样式和基础交互，无需联网加载字体或脚本；查看外部来源需要网络。<br><a class="back-top" href="#overview">回到报告开头</a></footer>
+ </main>
+</div>
+<script>
+document.getElementById('print-button').addEventListener('click',function(){window.print();});
+var sections=Array.from(document.querySelectorAll('header[id],section[id]'));
+var navLinks=Array.from(document.querySelectorAll('nav a'));
+var scheduled=false;
+function updateReading(){
+ var total=document.documentElement.scrollHeight-window.innerHeight;
+ var percent=total>0?Math.min(100,Math.max(0,Math.round(window.scrollY/total*100))):100;
+ document.getElementById('progress').style.width=percent+'%';
+ document.getElementById('reading-status').textContent='阅读进度 '+percent+'%';
+ var active=sections[0].id;
+ sections.forEach(function(section){if(section.getBoundingClientRect().top<=120)active=section.id;});
+ if(percent>=99)active='sources';
+ navLinks.forEach(function(link){if(link.getAttribute('href')==='#'+active)link.setAttribute('aria-current','location');else link.removeAttribute('aria-current');});
+ scheduled=false;
+}
+window.addEventListener('scroll',function(){if(!scheduled){scheduled=true;requestAnimationFrame(updateReading);}},{passive:true});
+window.addEventListener('resize',updateReading);
+document.querySelectorAll('details').forEach(function(item){item.addEventListener('toggle',updateReading);});
+updateReading();
+</script>
+</body>
+</html>
