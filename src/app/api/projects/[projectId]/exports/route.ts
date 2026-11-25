@@ -10,7 +10,7 @@ export async function POST(request: Request, context: Context) {
   try {
     localMutation(request); const { projectId } = await context.params; const body = await request.json();
     if (body.includeAudio !== undefined && typeof body.includeAudio !== 'boolean') throw new Error('配音导出参数不正确');
-    const audio = body.includeAudio === true ? new SpeechStore(getStore()).forExport(projectId, body.version, speechConfig().model) : [];
+    const audio = body.includeAudio === true ? new SpeechStore(getStore()).forExport(projectId, body.version, speechConfig(getStore().get(projectId)?.lesson.speechProvider).model) : [];
     return Response.json(getStore().enqueue(projectId, body.version, audio), { status: 202 });
   }
   catch (error) { return errorResponse(error); }

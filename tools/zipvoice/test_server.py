@@ -2,11 +2,23 @@ import base64
 import io
 import unittest
 import wave
+import time
 
 import server
 
 
+def hung_model(_config, deadline):
+    deadline.value = time.monotonic() + 0.15
+    while True:
+        time.sleep(0.05)
+
+
 class ValidationTests(unittest.TestCase):
+    def test_supervisor_terminates_a_model_that_exceeds_its_deadline(self):
+        started = time.monotonic()
+        self.assertTrue(server.run_model_process({}, hung_model))
+        self.assertLess(time.monotonic() - started, 6)
+
     def test_rejects_wrong_token_before_decoding_audio(self):
         with self.assertRaises(PermissionError):
             server.validate_request({}, "Bearer wrong", "secret")

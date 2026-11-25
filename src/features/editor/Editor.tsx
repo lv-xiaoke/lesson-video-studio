@@ -7,7 +7,9 @@ import { buildTimeline, totalFrames } from '@/video/timeline';
 import type { Lesson, Project } from '@/shared/lesson';
 import type { Scene } from '@/shared/scene';
 import type { Job } from '@/shared/job';
-import { narrationSignature, estimateSpeechCost } from '@/shared/narration';
+import { narrationSignature, estimateSpeechCost, canGenerateScenes } from '@/shared/narration';
+import type { SpeechProvider, VoiceSettings } from '@/shared/narration';
+import type { VoiceProfile } from '@/shared/voices';
 import type { PreviewAudio, SpeechConfig, SpeechState } from '@/shared/narration';
 import { NarrationPanel } from './NarrationPanel';
 import { SCENE_LABELS } from '@/shared/scene';
@@ -32,6 +34,8 @@ export function Editor({ projectId }: { projectId: string }) {
   const [message, setMessage] = useState('');
   const [speech, setSpeech] = useState<SpeechState>({ assets: [], jobs: [] });
   const [speechConfig, setSpeechConfig] = useState<SpeechConfig | null>(null);
+  const [voices, setVoices] = useState<VoiceProfile[]>([]);
+  const refreshVoices = useCallback(async () => { setVoices(await request<VoiceProfile[]>('/api/voices')); }, []);
   const [speechError, setSpeechError] = useState('');
   const [useAudio, setUseAudio] = useState(true);
   const [stage, setStage] = useState<Stage>('edit');
@@ -44,12 +48,31 @@ export function Editor({ projectId }: { projectId: string }) {
     setSpeech(state); setSpeechError('');
   }, [projectId]);
   useEffect(() => {
-    request<SpeechConfig>('/api/tts/config').then(setSpeechConfig).catch(() => setConfigError('无法读取配音服务配置，请刷新页面后重试。'));
     let active = true;
     const poll = async () => { try { const state = await request<SpeechState>(`/api/projects/${projectId}/narrations`); if (active) { setSpeech(state); setSpeechError(''); } } catch { if (active) setSpeechError('暂时无法获取配音状态，将自动重试'); } };
     void poll(); const timer = setInterval(poll, 2000);
     return () => { active = false; clearInterval(timer); };
   }, [projectId]);
+  useEffect(() => {
+    if (!draft) return;
+    let active = true;
+    const url = `/api/tts/config?projectId=${projectId}${draft.speechProvider ? `&provider=${draft.speechProvider}` : ''}`;
+    const refresh = () => { request<SpeechConfig>(url).then(config => { if (active) { setSpeechConfig(config); setConfigError(''); } }).catch(() => { if (active) setConfigError('无法读取配音服务配置，请稍后重试。'); }); };
+    refresh(); const timer = setInterval(refresh, 10000);
+    return () => { active = false; clearInterval(timer); };
+  }, [projectId, draft?.speechProvider, !!draft]);
+  useEffect(() => { void refreshVoices().catch(() => setConfigError('无法读取本地音色库，请刷新页面重试。')); }, [refreshVoices]);
+  function changeProvider(provider: SpeechProvider) {
+    if (!draft) return;
+    player.current?.pause(); setSpeechConfig(null); setConfigError('');
+    setDraft({ ...draft, speechProvider: provider, scenes: draft.scenes.map(s => ({ ...s, voice: { voiceId: 'unselected', speed: s.voice?.speed || 1 } })) });
+    setMessage('配音服务已切换，请选择音色后应用到全部小节。');
+  }
+  function applyVoiceToAll(voice: VoiceSettings) {
+    if (!draft) return;
+    player.current?.pause(); setDraft({ ...draft, scenes: draft.scenes.map(s => ({ ...s, voice: { ...voice } })) });
+    setMessage('已将音色和语速应用到全部小节，生成配音时会自动保存。');
+  }
   const allAudio: PreviewAudio = {};
   if (draft) for (const scene of draft.scenes) {
     const asset = speech.assets.find(a => a.sceneId === scene.id && a.signature === narrationSignature(scene, speechConfig?.provider) && a.model === speechConfig?.model);
@@ -155,6 +178,7 @@ export function Editor({ projectId }: { projectId: string }) {
   const missing = draft.scenes.filter(s => !allAudio[s.id]).map(s => s.id);
   const pendingSpeech = speech.jobs.some(j => j.status === 'queued' || j.status === 'running');
   const missingText = draft.scenes.filter(s => missing.includes(s.id)).map(s => s.narration).join('');
+  const voicesReady = canGenerateScenes(draft.scenes, missing, speechConfig, voices.map(v => v.id));
   const batchEstimate = estimateSpeechCost(missingText, speechConfig?.pricePer10k ?? null);
   const readiness = exportReadiness(draft, Object.keys(allAudio), useAudio);
   const exporting = jobs.some(job => job.status === 'queued' || job.status === 'running');
@@ -168,7 +192,7 @@ export function Editor({ projectId }: { projectId: string }) {
     setInspectorTab(tab); document.getElementById('scene-inspector')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
   const notice = error || configError || message;
-  const voiceHelp = !speechConfig ? '正在读取配音服务配置…' : !speechConfig.configured ? '请先配置配音服务并重启。已有配音仍可试听。' : pendingSpeech ? '后台正在逐节生成，你可以继续编辑或稍后回来查看。' : missing.length ? '点击一次即可依次生成全部缺失配音；已有有效配音会复用。' : '全部小节已配音。播放检查后，就可以导出视频。';
+  const voiceHelp = !speechConfig ? '正在读取配音服务配置…' : !speechConfig.configured ? speechConfig.reason || '请先配置配音服务并重启。已有配音仍可试听。' : !voicesReady ? '请在右侧选择音色，并将音色应用到全部小节。' : pendingSpeech ? '后台正在逐节生成，你可以继续编辑或稍后回来查看。' : missing.length ? '点击一次即可依次生成全部缺失配音；已有有效配音会复用。' : '全部小节已配音。播放检查后，就可以导出视频。';
   return <div className="editor-shell">
     <a className="skip-link" href="#editor-main">跳到制作区</a>
     <header className="editor-header">
@@ -202,9 +226,9 @@ export function Editor({ projectId }: { projectId: string }) {
           </div>
           {stage === 'voice' && <section className="speech-overview" aria-label="整片配音" aria-busy={pendingSpeech}>
             <div className="speech-overview-top"><div><h2>整片配音 <span>{Object.keys(allAudio).length} / {draft.scenes.length} 节已就绪</span></h2><p>{voiceHelp}</p></div>
-              <button className="primary" disabled={busy || pendingSpeech || !speechConfig?.configured || missing.length === 0} onClick={() => void generateNarration(missing)}>{pendingSpeech ? '正在生成配音…' : missing.length === draft.scenes.length ? `为全部小节生成配音（${missing.length} 节）` : missing.length ? `补齐配音（${missing.length} 节）` : '全部配音已就绪'}</button>
+              <button className="primary" disabled={busy || pendingSpeech || !speechConfig?.configured || !voicesReady || missing.length === 0} onClick={() => void generateNarration(missing)}>{pendingSpeech ? '正在生成配音…' : missing.length === draft.scenes.length ? `为全部小节生成配音（${missing.length} 节）` : missing.length ? `补齐配音（${missing.length} 节）` : '全部配音已就绪'}</button>
             </div><progress aria-label="配音完成进度" max={draft.scenes.length} value={Object.keys(allAudio).length} />
-            <div className="speech-overview-bottom"><span>{Array.from(missingText).length} 字符待生成{speechConfig?.provider === 'tencent' ? ' · 腾讯云精品音色' : batchEstimate === null ? '' : ` · 参考费用 ¥${batchEstimate.toFixed(4)}`}</span><button className="text-button" onClick={() => openInspector('sound')}>试听 / 调整当前节声音</button></div>
+            <div className="speech-overview-bottom"><span>{Array.from(missingText).length} 字符待生成{speechConfig?.provider === 'zipvoice' ? ' · 本地 ZipVoice，无 API 费用' : speechConfig?.provider === 'tencent' ? ' · 腾讯云精品音色' : batchEstimate === null ? '' : ` · 参考费用 ¥${batchEstimate.toFixed(4)}`}</span><button className="text-button" onClick={() => openInspector('sound')}>试听 / 调整当前节声音</button></div>
             {speechError && <p className="error" role="alert">{speechError}</p>}
           </section>}
           {stage === 'export' && <section className={'export-check ' + (readiness.ready ? 'is-ready' : '')} aria-label="导出检查">
@@ -240,7 +264,7 @@ export function Editor({ projectId }: { projectId: string }) {
             {scene.kind === 'comparison' && scene.comparison && <ComparisonFields value={scene.comparison} onChange={comparison => patchScene({ comparison })} />}
             <label htmlFor="scene-duration">{audio[scene.id] ? '画面时长（按配音自动匹配）' : '画面时长（秒）'}<input id="scene-duration" type="number" min={3} max={60} step={0.5} disabled={!!audio[scene.id]} value={audio[scene.id] ? timeline[selected].durationInFrames / 30 : scene.durationSeconds} onChange={event => { const n = Number(event.target.value); if (Number.isFinite(n)) patchScene({ durationSeconds: Math.max(3, Math.min(60, n)) }); }} /></label>
           </fieldset>}
-          {inspectorTab === 'sound' && <NarrationPanel scene={scene} projectId={projectId} assets={speech.assets} jobs={speech.jobs} config={speechConfig} busy={busy} error={speechError || configError} onChange={patchScene} onGenerate={force => void generateNarration([scene.id], force)} onListen={() => player.current?.pause()} />}
+          {inspectorTab === 'sound' && <NarrationPanel scene={scene} projectId={projectId} assets={speech.assets} jobs={speech.jobs} config={speechConfig} intendedProvider={draft.speechProvider} busy={busy} error={speechError || configError} onChange={patchScene} onGenerate={force => void generateNarration([scene.id], force)} onListen={() => player.current?.pause()} voices={voices} onRefreshVoices={refreshVoices} onProviderChange={changeProvider} onApplyAll={applyVoiceToAll} />}
         </div>
       </aside>
     </div>

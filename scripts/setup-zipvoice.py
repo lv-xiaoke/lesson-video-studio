@@ -11,7 +11,14 @@ import venv
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-DATA = ROOT / "data" / "zipvoice"
+def configured_data_root():
+    # Use Node's own .env parser, exactly as Web/Worker do; print only DATA_DIR, never keys.
+    output = subprocess.check_output(["node", "--env-file-if-exists=.env.local", "-e",
+                                     "console.log(require('node:path').resolve(process.env.DATA_DIR || 'data'))"], cwd=ROOT, text=True)
+    return Path(output.strip())
+
+
+DATA = configured_data_root() / "zipvoice"
 BASE = "https://github.com/k2-fsa/sherpa-onnx/releases/download/"
 FILES = {
     "sherpa-onnx-zipvoice-distill-int8-zh-en-emilia.tar.bz2": BASE + "tts-models/sherpa-onnx-zipvoice-distill-int8-zh-en-emilia.tar.bz2",

@@ -1,6 +1,9 @@
 $ErrorActionPreference = 'Stop'
 $repoRoot = Split-Path $PSScriptRoot -Parent
-$zipvoiceRoot = Join-Path $repoRoot 'data/zipvoice'
+Set-Location -LiteralPath $repoRoot
+$configuredDataRoot = & node --env-file-if-exists=.env.local -e "console.log(require('node:path').resolve(process.env.DATA_DIR || 'data'))"
+if ($LASTEXITCODE -ne 0) { throw '读取数据目录失败' }
+$zipvoiceRoot = Join-Path $configuredDataRoot 'zipvoice'
 $python = Join-Path $zipvoiceRoot 'runtime/Scripts/python.exe'
 $configPath = Join-Path $zipvoiceRoot 'service.json'
 if (!(Test-Path -LiteralPath $python) -or !(Test-Path -LiteralPath $configPath)) { throw '请先运行 python scripts/setup-zipvoice.py' }

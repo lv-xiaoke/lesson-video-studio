@@ -39,6 +39,10 @@ export type NarrationAsset = {
 };
 export type SpeechState = { assets: NarrationAsset[]; jobs: SpeechJob[] };
 export type SpeechConfig = { provider: SpeechProvider; configured: boolean; model: string; pricePer10k: number | null; reason?: string };
+export function canGenerateScenes(scenes: Scene[], ids: string[], config: SpeechConfig | null, activeVoiceIds: string[]) {
+  if (!config) return false;
+  return ids.every(id => { const scene = scenes.find(s => s.id === id); if (!scene) return false; const voice = voiceOf(scene, config.provider); return !!voice.voiceId && voice.voiceId !== 'unselected' && (config.provider !== 'zipvoice' || activeVoiceIds.includes(voice.voiceId)); });
+}
 export function estimateSpeechCost(text: string, price: number | null) {
   return price === null ? null : Math.round(Array.from(text).length * price / 10_000 * 1_000_000) / 1_000_000;
 }

@@ -5,7 +5,7 @@ import { VoiceStore } from '../src/server/voices/store.ts';
 import { SpeechStore } from '../src/server/narration/store.ts';
 import { createExampleLesson, parseLesson } from '../src/shared/lesson.ts';
 import { normalizeAiResult } from '../src/shared/ai-validation.ts';
-import { providerForModel, voiceOf, ZIPVOICE_MODEL } from '../src/shared/narration.ts';
+import { providerForModel, voiceOf, ZIPVOICE_MODEL, canGenerateScenes } from '../src/shared/narration.ts';
 
 test('project speech service survives parsing and AI lesson/rewrite application', () => {
   const source = { ...createExampleLesson(), speechProvider: 'zipvoice' as const };
@@ -20,6 +20,15 @@ test('local engine is routed explicitly and never silently assigns a cloud voice
   assert.equal(providerForModel(ZIPVOICE_MODEL), 'zipvoice');
   assert.equal(providerForModel('speech-2.6-hd'), 'minimax');
   assert.equal(voiceOf(createExampleLesson().scenes[0], 'zipvoice').voiceId, '');
+});
+test('bulk generation only validates requested missing scenes, not archived voices with cached audio', () => {
+  const lesson = createExampleLesson();
+  lesson.scenes[0].voice = { voiceId: 'archived', speed: 1 };
+  lesson.scenes[1].voice = { voiceId: 'active', speed: 1 };
+  const config = { provider: 'zipvoice' as const, model: ZIPVOICE_MODEL, configured: true, pricePer10k: 0 };
+  assert.equal(canGenerateScenes(lesson.scenes, ['compare'], config, ['active']), true);
+  assert.equal(canGenerateScenes(lesson.scenes, ['intro', 'compare'], config, ['active']), false);
+  assert.equal(canGenerateScenes(lesson.scenes, ['compare'], null, ['active']), false);
 });
 
 test('archived voice rejects new jobs atomically but frozen jobs and cached audio survive', () => {

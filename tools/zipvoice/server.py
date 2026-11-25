@@ -6,6 +6,8 @@ import json
 import os
 import threading
 import time
+import math
+import multiprocessing
 import wave
 from array import array
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
@@ -53,12 +55,13 @@ def load_engine(model_dir, threads):
     return sherpa_onnx.OfflineTts(config)
 
 
-def serve(config):
+def serve(config, deadline):
     import numpy as np
     import sherpa_onnx
     started = time.monotonic()
     engine = load_engine(config["modelDir"], int(os.environ.get("ZIPVOICE_THREADS", "4")))
     loaded_seconds = time.monotonic() - started
+    deadline.value = 0
     lock = threading.Lock()
 
     class Handler(BaseHTTPRequestHandler):
@@ -95,9 +98,13 @@ def serve(config):
                     raise ValueError("Invalid request size")
                 payload = json.loads(self.rfile.read(length))
                 text, reference, samples = validate_request(payload, self.headers.get("Authorization"), config["token"])
+                timeout = payload.get("timeoutSeconds", 900)
+                if not isinstance(timeout, (int, float)) or not math.isfinite(timeout) or not 0 < timeout <= 900:
+                    raise ValueError("Invalid generation deadline")
                 acquired = lock.acquire(blocking=False)
                 if not acquired:
                     return self.reply(409, b'{"error":"Engine busy"}')
+                deadline.value = time.monotonic() + timeout
                 generation = sherpa_onnx.GenerationConfig()
                 generation.reference_audio = np.array(samples, dtype=np.float32) / 32768.0
                 generation.reference_sample_rate = 24000
@@ -121,10 +128,36 @@ def serve(config):
                 self.reply(500, b'{"error":"Local synthesis failed; check service log"}')
             finally:
                 if acquired:
+                    deadline.value = 0
                     lock.release()
 
     print(json.dumps({"ready": True, "loadSeconds": loaded_seconds}), flush=True)
     ThreadingHTTPServer(("127.0.0.1", int(config["port"])), Handler).serve_forever()
+
+
+def run_model_process(config, target=serve):
+    """Parent owns deadline, so even native inference holding the GIL can be stopped."""
+    deadline = multiprocessing.Value("d", time.monotonic() + 120)
+    child = multiprocessing.Process(target=target, args=(config, deadline), daemon=True)
+    child.start()
+    timed_out = False
+    try:
+        while child.is_alive():
+            child.join(0.1)
+            if deadline.value and time.monotonic() >= deadline.value:
+                timed_out = True
+                child.terminate()
+                child.join(5)
+                if child.is_alive():
+                    child.kill()
+                    child.join()
+                break
+    finally:
+        if child.is_alive():
+            child.terminate()
+            child.join(5)
+        child.close()
+    return timed_out
 
 
 if __name__ == "__main__":
@@ -133,4 +166,5 @@ if __name__ == "__main__":
         settings = json.load(source)
     if not settings.get("token") or not 1024 <= int(settings["port"]) <= 65535:
         raise ValueError("Invalid local service settings")
-    serve(settings)
+    while run_model_process(settings):
+        print("Local model exceeded deadline; restarting model process", flush=True)
