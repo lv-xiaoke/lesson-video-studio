@@ -23,10 +23,13 @@ test('local adapter combines real WAV segments, measures speed and rejects faile
   process.env.DATA_DIR = root; mkdirSync(join(root, 'zipvoice'), { recursive: true }); mkdirSync(join(root, 'voices'), { recursive: true });
   const reference = pcmWav(Buffer.alloc(48000 * 4)); writeFileSync(join(root, 'voices/ref.wav'), reference);
   let failure = false;
+  const synthesisText: string[] = [];
   const engine = createServer(async (req, res) => {
     if (req.headers.authorization !== 'Bearer private-test-token') { res.writeHead(401).end(); return; }
     if (req.url === '/health') { res.setHeader('Content-Type', 'application/json'); res.end(JSON.stringify({ ready: true, model: ZIPVOICE_MODEL })); return; }
-    for await (const _chunk of req) { /* drain request */ }
+    const chunks: Buffer[] = [];
+    for await (const chunk of req) chunks.push(chunk);
+    synthesisText.push(JSON.parse(Buffer.concat(chunks).toString()).text);
     if (failure) { res.writeHead(500).end(); return; }
     res.setHeader('Content-Type', 'audio/wav'); res.end(pcmWav(Buffer.alloc(48000)));
   });
@@ -41,7 +44,16 @@ test('local adapter combines real WAV segments, measures speed and rejects faile
     const saved = projects.save(p.id, p.lesson, 1); speech.enqueue(saved.id, saved.version, ['intro'], { model: ZIPVOICE_MODEL, pricePer10k: 0 }); const job = speech.claim()!;
     const health = await zipvoiceHealth();
     assert.equal(health.configured, true, JSON.stringify(health));
-    const result = await synthesizeZipVoice(job, voices); assert.equal(result.durationSeconds, 2); assert.equal(result.format, 'wav');
+    const result = await synthesizeZipVoice(job, voices);
+    assert.deepEqual(synthesisText, ['第一句。第二句。']);
+    assert.equal(result.durationSeconds, 1);
+    assert.equal(result.format, 'wav');
+    synthesisText.length = 0;
+    const longSentence = '第一段' + '讲'.repeat(145) + '。';
+    const nextSentence = '第二段' + '读'.repeat(108) + '。';
+    const longResult = await synthesizeZipVoice({ ...job, text: longSentence + nextSentence }, voices);
+    assert.deepEqual(synthesisText, [longSentence, nextSentence]);
+    assert.equal(longResult.durationSeconds, 2);
     failure = true;
     await assert.rejects(processSpeechJob(job, speech, j => synthesizeZipVoice(j, voices)), /引擎生成失败/);
     assert.equal(speech.list(saved.id).assets.length, 0);

@@ -5,8 +5,10 @@ function Test-ZipvoiceIdentity($record, $metadata, $expectedScript, $expectedCon
     if (!$command.Contains('"' + $expectedScript.Replace('/', '\') + '"') -or !$command.Contains('"' + $expectedConfig.Replace('/', '\') + '"')) { return $false }
     if ($metadata.configPath -and $metadata.configPath -ne $expectedConfig) { return $false }
     try {
-        $expectedTime = if ($metadata.processCreatedAt) { [datetimeoffset]::Parse($metadata.processCreatedAt) } else { [datetimeoffset]::Parse($metadata.startedAt) }
-        $difference = [math]::Abs(($record.CreationDate.ToUniversalTime() - $expectedTime.UtcDateTime).TotalSeconds)
+        $timestamp = if ($metadata.processCreatedAt) { $metadata.processCreatedAt } else { $metadata.startedAt }
+        # Newer PowerShell versions can deserialize an ISO timestamp directly to DateTime.
+        $expectedUtc = if ($timestamp -is [datetime]) { $timestamp.ToUniversalTime() } else { ([datetimeoffset]::Parse($timestamp)).UtcDateTime }
+        $difference = [math]::Abs(($record.CreationDate.ToUniversalTime() - $expectedUtc).TotalSeconds)
         $tolerance = if ($metadata.processCreatedAt) { 0.1 } else { 5 }
         return $difference -lt $tolerance
     } catch { return $false }

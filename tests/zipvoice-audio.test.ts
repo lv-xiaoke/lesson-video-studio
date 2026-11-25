@@ -10,6 +10,27 @@ test('local text splitting preserves every character at punctuation and unicode 
   assert.ok(chunks.every(s => Array.from(s).length <= 200));
   assert.throws(() => splitLocalText('  '), /文字/);
 });
+test('local text splitting merges short sentences into natural narration chunks', () => {
+  const input = '先看这里。再看下一步。最后检查结果。';
+  const chunks = splitLocalText(input);
+  assert.deepEqual(chunks, [input]);
+});
+test('newlines are soft boundaries and do not create tiny standalone chunks', () => {
+  const input = '第一步先准备数据。\n第二步再处理数据。\n第三步检查结果。';
+  const chunks = splitLocalText(input);
+  assert.equal(chunks.join(''), input);
+  assert.ok(chunks.every(chunk => Array.from(chunk).length >= 10));
+});
+test('long narration splits after a complete sentence and its closing quote', () => {
+  const first = '老师说：“' + '讲'.repeat(150) + '！”';
+  const second = '接下来，我们用这个方法' + '练'.repeat(100) + '。';
+  assert.deepEqual(splitLocalText(first + second), [first, second]);
+});
+test('a long line uses clause boundaries without splitting a decimal', () => {
+  const first = '讲'.repeat(150) + '，';
+  const second = '讲'.repeat(38) + '3.14是圆周率' + '练'.repeat(50) + '。';
+  assert.deepEqual(splitLocalText(first + second), [first, second]);
+});
 test('reference decoder rejects corrupt, too-short and overlong files and normalizes valid WAV', async () => {
   await assert.rejects(normalizeReference(Buffer.from('not audio')), /录音/);
   await assert.rejects(normalizeReference(pcmWav(Buffer.alloc(24000 * 2))), /3～30/);

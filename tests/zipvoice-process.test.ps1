@@ -9,6 +9,10 @@ $record = [pscustomobject]@{ CommandLine="`"$python`" -u `"$scriptPath`" `"$conf
 if (!(Test-ZipvoiceIdentity $record $metadata $scriptPath $configPath $python 'owner' 'owner')) { throw 'Owned process should match' }
 if (Test-ZipvoiceIdentity $record $metadata $scriptPath 'D:\other\service.json' $python 'owner' 'owner') { throw 'Different config must never match' }
 if (Test-ZipvoiceIdentity $record $metadata $scriptPath $configPath $python 'other-owner' 'owner') { throw 'Different owner must never match' }
+$precise = [datetime]::new(2026, 11, 25, 7, 14, 1, 749, [DateTimeKind]::Utc)
+$metadata | Add-Member -NotePropertyName processCreatedAt -NotePropertyValue $precise
+$record.CreationDate = $precise
+if (!(Test-ZipvoiceIdentity $record $metadata $scriptPath $configPath $python 'owner' 'owner')) { throw 'Timestamps parsed as DateTime must retain their precision' }
 $record.CreationDate = $now.AddMinutes(1)
 if (Test-ZipvoiceIdentity $record $metadata $scriptPath $configPath $python 'owner' 'owner') { throw 'Reused PID creation mismatch must never match' }
 Write-Output 'Process identity checks passed'

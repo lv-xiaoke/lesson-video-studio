@@ -131,6 +131,8 @@ def serve(config, deadline, stage):
                 generation.reference_sample_rate = 24000
                 generation.reference_text = reference
                 generation.num_steps = 4
+                # Keep short clauses together and avoid the default split every 20 Chinese characters.
+                generation.extra = {"min_words_in_sentence": "12", "max_words_in_sentence": "40"}
                 audio = engine.generate(text, generation)
                 if not len(audio.samples):
                     raise ValueError("Empty generated audio")

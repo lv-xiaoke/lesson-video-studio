@@ -1,13 +1,45 @@
 import { spawn } from 'node:child_process';
 
-export function splitLocalText(text: string): string[] {
-  if (!text.trim() || Array.from(text).length > 3000) throw new Error('讲解文字应为 1～3000 字');
-  const chunks: string[] = []; let current = '';
-  for (const char of text) {
-    current += char;
-    if (Array.from(current).length >= 200 || /[。！？!?\n]/u.test(char)) { chunks.push(current); current = ''; }
+const LOCAL_TEXT_LIMIT = 200;
+const SENTENCE_END = /[。！？!?．.]/u;
+const CLAUSE_END = /[，、；;,]/u;
+const CLOSING_MARK = /[”’」』》〉】）)\]"']/u;
+const LATIN_OR_DIGIT = /[a-z0-9]/i;
+
+function localTextBoundary(chars: string[], start: number, limit: number) {
+  let previous = limit;
+  let bestRank = 0;
+  for (let end = limit; end >= start + LOCAL_TEXT_LIMIT / 2; end--) {
+    // Keep closing quotes and sequences like “？！” with the clause they close.
+    if (SENTENCE_END.test(chars[end]) || CLOSING_MARK.test(chars[end])) continue;
+    let marker = end - 1;
+    while (marker > start && CLOSING_MARK.test(chars[marker])) marker--;
+    const char = chars[marker];
+    const insideLatin = char === '.' && LATIN_OR_DIGIT.test(chars[marker - 1] || '') && LATIN_OR_DIGIT.test(chars[marker + 1] || '');
+    const insideNumber = char === ',' && /\d/.test(chars[marker - 1] || '') && /\d/.test(chars[marker + 1] || '');
+    if (!insideLatin && SENTENCE_END.test(char)) return end;
+    const rank = !insideNumber && CLAUSE_END.test(char) ? 2 : /\s/u.test(char) ? 1 : 0;
+    if (rank > bestRank) {
+      previous = end;
+      bestRank = rank;
+    }
   }
-  if (current) chunks.push(current);
+  return previous;
+}
+
+export function splitLocalText(text: string): string[] {
+  const chars = Array.from(text);
+  if (!text.trim() || chars.length > 3000) throw new Error('讲解文字应为 1～3000 字');
+  const chunks: string[] = [];
+  let start = 0;
+  while (chars.length - start > LOCAL_TEXT_LIMIT) {
+    // Leave enough text for the final request when the limit falls near the end.
+    const limit = Math.min(start + LOCAL_TEXT_LIMIT, chars.length - 12);
+    const end = localTextBoundary(chars, start, limit);
+    chunks.push(chars.slice(start, end).join(''));
+    start = end;
+  }
+  chunks.push(chars.slice(start).join(''));
   return chunks;
 }
 export function wavInfo(wav: Buffer) {
