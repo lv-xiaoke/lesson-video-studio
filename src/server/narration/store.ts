@@ -3,12 +3,15 @@ import { ConflictError, NotFoundError, ProjectStore } from '../db/store.ts';
 import { narrationSignature, providerForModel, voiceOf } from '../../shared/narration.ts';
 import type { AudioTrack, NarrationAsset, SpeechJob } from '../../shared/narration.ts';
 import type { Project } from '../../shared/lesson.ts';
+import { VoiceStore } from '../voices/store.ts';
 type Row = Record<string, unknown>;
 const decode = <T>(row: Row): T => JSON.parse(String(row.payload));
 export class SpeechStore {
   projects: ProjectStore;
+  voices: VoiceStore;
   constructor(projects: ProjectStore) {
     this.projects = projects;
+    this.voices = new VoiceStore(projects);
     projects.db.exec(`CREATE TABLE IF NOT EXISTS speech_jobs(id TEXT PRIMARY KEY, project_id TEXT NOT NULL, status TEXT NOT NULL, payload TEXT NOT NULL);
       CREATE TABLE IF NOT EXISTS speech_assets(id TEXT PRIMARY KEY, project_id TEXT NOT NULL, payload TEXT NOT NULL);
       CREATE INDEX IF NOT EXISTS speech_jobs_project ON speech_jobs(project_id);
@@ -32,12 +35,14 @@ export class SpeechStore {
       for (const id of ids) {
         const scene = project.lesson.scenes.find(s => s.id === id)!;
         const provider = providerForModel(config.model);
+        if (!voiceOf(scene, provider).voiceId || voiceOf(scene, provider).voiceId === 'unselected') throw new Error('请为全部所选小节选择音色');
+        const reference = provider === 'zipvoice' ? this.voices.active(voiceOf(scene, provider).voiceId) : undefined;
         const signature = narrationSignature(scene, provider);
         const pending = existing.jobs.find(j => j.sceneId === id && j.signature === signature && j.model === config.model && (j.status === 'queued' || j.status === 'running'));
         if (pending) { result.jobs.push(pending); continue; }
         const reusable = existing.assets.find(a => a.sceneId === id && a.signature === signature && a.model === config.model);
         if (!force && reusable) { result.reused.push(reusable); continue; }
-        const job: SpeechJob = { id: randomUUID(), projectId, sceneId: id, version, signature, text: scene.narration, model: config.model, voice: voiceOf(scene, provider), pricePer10k: config.pricePer10k, status: 'queued', error: null, createdAt: new Date().toISOString() };
+        const job: SpeechJob = { id: randomUUID(), projectId, sceneId: id, version, signature, text: scene.narration, model: config.model, voice: voiceOf(scene, provider), ...(reference ? { referenceHash: reference.hash } : {}), pricePer10k: config.pricePer10k, status: 'queued', error: null, createdAt: new Date().toISOString() };
         db.prepare('INSERT INTO speech_jobs VALUES(?,?,?,?)').run(job.id, projectId, job.status, JSON.stringify(job)); result.jobs.push(job);
       }
       db.exec('COMMIT'); return result;

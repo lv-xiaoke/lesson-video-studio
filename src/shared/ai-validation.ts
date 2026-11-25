@@ -33,11 +33,11 @@ export function normalizeAiResult(raw: unknown, input: AiInput, source: Lesson):
   };
   if (input.kind === 'lesson') {
     if (!Array.isArray(value.scenes) || !value.scenes.length || value.scenes.length > 20) throw new Error('AI 返回的小节数量应为 1～20 个');
-    return parseLesson({ title: text(value.title, 'AI 视频标题', 100), scenes: value.scenes.map(s => parseScene(s)) });
+    return parseLesson({ title: text(value.title, 'AI 视频标题', 100), scenes: value.scenes.map(s => parseScene(s)), speechProvider: source.speechProvider });
   }
   const index = source.scenes.findIndex(s => s.id === input.sceneId);
   if (index < 0) throw new Error('要改写的小节不存在');
   const scenes: unknown[] = structuredClone(source.scenes);
   scenes[index] = parseScene(value.scene, source.scenes[index]);
-  return parseLesson({ title: source.title, scenes });
+  return parseLesson({ title: source.title, scenes, speechProvider: source.speechProvider });
 }

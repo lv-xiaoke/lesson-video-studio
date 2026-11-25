@@ -1,6 +1,7 @@
 import { SCENE_LABELS } from './scene.ts';
 import type { ComparisonContent, Scene } from './scene.ts';
-export type Lesson = { title: string; scenes: Scene[] };
+import type { SpeechProvider } from './narration.ts';
+export type Lesson = { title: string; scenes: Scene[]; speechProvider?: SpeechProvider };
 export type Project = { id: string; version: number; updatedAt: string; lesson: Lesson };
 
 function text(value: unknown, label: string, max: number): string {
@@ -47,7 +48,8 @@ export function parseLesson(value: unknown): Lesson {
     }
     return { id, kind: s.kind as Scene['kind'], title: text(s.title, '小节标题', 100), content, narration: text(s.narration, '讲解稿', 3000), durationSeconds: s.durationSeconds, ...(voice ? { voice } : {}), ...(comparison ? { comparison } : {}) };
   });
-  return { title, scenes };
+  if (input.speechProvider !== undefined && !['tencent', 'minimax', 'zipvoice'].includes(String(input.speechProvider))) throw new Error('配音服务不正确');
+  return { title, scenes, ...(input.speechProvider ? { speechProvider: input.speechProvider as SpeechProvider } : {}) };
 }
 export function createExampleLesson(title = '用二分查找，快速找到一个数'): Lesson {
   return { title, scenes: [

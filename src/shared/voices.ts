@@ -1,0 +1,2 @@
+export type VoiceProfile = { id: string; name: string; referenceText: string; path: string; hash: string; durationSeconds: number; createdAt: string; archivedAt: string | null };
+export type VoicePreview = { id: string; voiceId: string; text: string; status: 'queued' | 'running' | 'succeeded' | 'failed'; path: string | null; durationSeconds: number | null; error: string | null; createdAt: string };
