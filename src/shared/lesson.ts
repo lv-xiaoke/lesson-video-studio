@@ -1,4 +1,5 @@
-import type { Scene } from './scene.ts';
+import { SCENE_LABELS } from './scene.ts';
+import type { ComparisonContent, Scene } from './scene.ts';
 export type Lesson = { title: string; scenes: Scene[] };
 export type Project = { id: string; version: number; updatedAt: string; lesson: Lesson };
 
@@ -19,7 +20,7 @@ export function parseLesson(value: unknown): Lesson {
     if (!/^[a-zA-Z0-9_-]+$/.test(id)) throw new Error('小节 ID 格式不正确');
     if (ids.has(id)) throw new Error('小节 ID 不能重复');
     ids.add(id);
-    if (typeof s.kind !== 'string' || !['title', 'array', 'summary'].includes(s.kind)) throw new Error('未知的画面类型');
+    if (typeof s.kind !== 'string' || !Object.hasOwn(SCENE_LABELS, s.kind)) throw new Error('未知的画面类型');
     if (typeof s.durationSeconds !== 'number' || !Number.isFinite(s.durationSeconds) || s.durationSeconds < 3 || s.durationSeconds > 60) throw new Error('每小节时长应为 3～60 秒');
     let voice: Scene['voice'];
     if (s.voice !== undefined) {
@@ -29,7 +30,22 @@ export function parseLesson(value: unknown): Lesson {
       if (typeof v.speed !== 'number' || !Number.isFinite(v.speed) || v.speed < 0.5 || v.speed > 2) throw new Error('语速应为 0.5～2 倍');
       voice = { voiceId: v.voiceId, speed: v.speed };
     }
-    return { id, kind: s.kind as Scene['kind'], title: text(s.title, '小节标题', 100), content: text(s.content, '画面文字', 1000), narration: text(s.narration, '讲解稿', 3000), durationSeconds: s.durationSeconds, ...(voice ? { voice } : {}) };
+    const content = text(s.content, '画面文字', 1000);
+    if (s.kind === 'steps') {
+      const lines = content.split('\n').map(v => v.trim()).filter(Boolean);
+      if (!lines.length || lines.length > 5 || lines.some(v => v.length > 80)) throw new Error('步骤应为 1～5 行，每行最多 80 字');
+    }
+    let comparison: ComparisonContent | undefined;
+    if (s.kind === 'comparison') {
+      if (!s.comparison || typeof s.comparison !== 'object') throw new Error('请填写左右对比内容');
+      const c = s.comparison as Record<string, unknown>;
+      const points = (raw: unknown) => {
+        if (!Array.isArray(raw) || raw.length < 1 || raw.length > 4) throw new Error('对比要点应为 1～4 条');
+        return raw.map(v => text(v, '对比要点', 60));
+      };
+      comparison = { leftTitle: text(c.leftTitle, '左侧对比标题', 30), leftPoints: points(c.leftPoints), rightTitle: text(c.rightTitle, '右侧对比标题', 30), rightPoints: points(c.rightPoints) };
+    }
+    return { id, kind: s.kind as Scene['kind'], title: text(s.title, '小节标题', 100), content, narration: text(s.narration, '讲解稿', 3000), durationSeconds: s.durationSeconds, ...(voice ? { voice } : {}), ...(comparison ? { comparison } : {}) };
   });
   return { title, scenes };
 }

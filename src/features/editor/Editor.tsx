@@ -10,8 +10,12 @@ import type { Job } from '@/shared/job';
 import { narrationSignature, estimateSpeechCost } from '@/shared/narration';
 import type { PreviewAudio, SpeechConfig, SpeechState } from '@/shared/narration';
 import { NarrationPanel } from './NarrationPanel';
+import { SCENE_LABELS } from '@/shared/scene';
+import { appendScene, duplicateScene, removeScene, changeSceneKind } from '@/shared/scene-actions';
+import { SceneActions } from './SceneActions';
+import { ComparisonFields } from './ComparisonFields';
 
-const labels = { title: '开场标题', array: '数组演示', summary: '知识总结' };
+const labels = SCENE_LABELS;
 const jobLabels = { queued: '等待后台制作', running: '正在制作', succeeded: '制作完成', failed: '制作失败' };
 async function request<T>(url: string, init?: RequestInit): Promise<T> {
   const response = await fetch(url, init); const data = await response.json();
@@ -99,6 +103,22 @@ export function Editor({ projectId }: { projectId: string }) {
   function patchScene(patch: Partial<Scene>) {
     setDraft(current => current ? { ...current, scenes: current.scenes.map((s, i) => i === selected ? { ...s, ...patch } : s) } : current);
   }
+  function manageScene(action: 'add' | 'copy' | 'remove') {
+    if (!draft) return;
+    if (action === 'remove' && !window.confirm('删除当前小节？原有音频文件仍会保留。')) return;
+    try {
+      player.current?.pause();
+      const next = action === 'add' ? appendScene(draft) : action === 'copy' ? duplicateScene(draft, draft.scenes[selected].id) : removeScene(draft, draft.scenes[selected].id);
+      setDraft(next);
+      setSelected(action === 'add' ? next.scenes.length - 1 : action === 'copy' ? selected + 1 : Math.min(selected, next.scenes.length - 1));
+      setError(''); setMessage('小节已调整，请保存项目。');
+    } catch (error) { setError(error instanceof Error ? error.message : '小节操作失败'); }
+  }
+  function setSceneKind(kind: Scene['kind']) {
+    if (!draft) return;
+    try { player.current?.pause(); patchScene(changeSceneKind(draft.scenes[selected], kind)); setError(''); }
+    catch (error) { setError(error instanceof Error ? error.message : '模板切换失败'); }
+  }
   function select(index: number) {
     setSelected(index); if (draft) player.current?.seekTo(buildTimeline(draft.scenes, 30, audio)[index].from + 20);
   }
@@ -118,7 +138,7 @@ export function Editor({ projectId }: { projectId: string }) {
   const batchEstimate = estimateSpeechCost(missingText, speechConfig?.pricePer10k ?? null);
   return <div className="editor-shell">
     <header className="editor-header"><div className="editor-brand"><Link href="/" onClick={e => { if (dirty && !window.confirm('草稿尚未保存，确定返回吗？')) e.preventDefault(); }}>知帧</Link><span className="divider" /><span className="project-name">{project.lesson.title}</span></div><div className="header-actions"><span className={dirty ? 'unsaved' : 'saved'}>{dirty ? '有未保存修改' : `已保存 · 版本 ${project.version}`}</span><button disabled={busy || !dirty} onClick={() => void saveAndMaybeExport(false)}>保存项目</button><button className="primary" disabled={busy || jobs.some(j => j.status === 'queued' || j.status === 'running')} onClick={() => void saveAndMaybeExport(true)}>{busy ? '正在处理…' : useAudio ? '导出带配音视频' : '导出无声视频'}</button></div></header>
-    <div className="editor-body"><aside className="scene-sidebar"><div className="sidebar-title"><h2>教学小节</h2><span>{draft.scenes.length} 节</span></div><p className="sidebar-help">点击小节，调整画面与讲解。</p><div className="scene-list">{draft.scenes.map((s, i) => <button className={`scene-item ${selected === i ? 'active' : ''}`} onClick={() => select(i)} key={s.id} disabled={busy}><span className="scene-number">{String(i + 1).padStart(2, '0')}</span><span><b>{s.title || '未命名小节'}</b><small>{labels[s.kind]} · {(timeline[i].durationInFrames / 30).toFixed(1)} 秒</small></span></button>)}</div><div className="reorder"><button disabled={busy || selected === 0} onClick={() => move(-1)}>上移</button><button disabled={busy || selected === draft.scenes.length - 1} onClick={() => move(1)}>下移</button></div><div className="sidebar-bottom"><span className="pill">制作说明</span><p>先编辑并确认讲解，再生成小节配音。修改文字、音色或语速后，只需更新受影响的小节。</p></div></aside>
+    <div className="editor-body"><aside className="scene-sidebar"><div className="sidebar-title"><h2>教学小节</h2><span>{draft.scenes.length} 节</span></div><p className="sidebar-help">点击小节，调整画面与讲解。</p><div className="scene-list">{draft.scenes.map((s, i) => <button className={`scene-item ${selected === i ? 'active' : ''}`} onClick={() => select(i)} key={s.id} disabled={busy}><span className="scene-number">{String(i + 1).padStart(2, '0')}</span><span><b>{s.title || '未命名小节'}</b><small>{labels[s.kind]} · {(timeline[i].durationInFrames / 30).toFixed(1)} 秒</small></span></button>)}</div><div className="reorder"><button disabled={busy || selected === 0} onClick={() => move(-1)}>上移</button><button disabled={busy || selected === draft.scenes.length - 1} onClick={() => move(1)}>下移</button></div><SceneActions count={draft.scenes.length} busy={busy} onAction={manageScene} /><div className="sidebar-bottom"><span className="pill">制作说明</span><p>先编辑并确认讲解，再生成小节配音。修改文字、音色或语速后，只需更新受影响的小节。</p></div></aside>
     <main className="preview-main"><div className="preview-heading"><div><span className="eyebrow">画面预览</span><h1>让每个知识点，都讲得清楚。</h1></div><span className="format">16:9 · 1080P · 30 FPS</span></div>
       <div className="player-wrap"><Player ref={player} component={LessonVideo} inputProps={{ lesson: draft, audio }} compositionWidth={1920} compositionHeight={1080} durationInFrames={totalFrames(draft.scenes, 30, audio)} fps={30} controls style={{ width: '100%', aspectRatio: '16 / 9' }} acknowledgeRemotionLicense /></div>
       <div className="preview-caption"><span>画面和字幕实时更新</span><span>总时长 {(totalFrames(draft.scenes, 30, audio) / 30).toFixed(1)} 秒 · {useAudio ? `${Object.keys(allAudio).length}/${draft.scenes.length} 节配音就绪` : '无配音预览'}</span></div>
@@ -130,8 +150,8 @@ export function Editor({ projectId }: { projectId: string }) {
     <aside className="inspector"><div className="inspector-heading"><span className="eyebrow">编辑第 {selected + 1} 小节</span><h2>{labels[scene.kind]}</h2></div><fieldset disabled={busy}>
       <label htmlFor="lesson-title">视频标题<input id="lesson-title" value={draft.title} maxLength={100} onChange={e => setDraft({ ...draft, title: e.target.value })} /></label>
       <div className="field-divider" /><label htmlFor="scene-title">小节标题<input id="scene-title" value={scene.title} maxLength={60} onChange={e => patchScene({ title: e.target.value })} /></label>
-      <label htmlFor="scene-kind">画面类型<select id="scene-kind" value={scene.kind} onChange={e => patchScene({ kind: e.target.value as Scene['kind'] })}>{Object.entries(labels).map(([value, label]) => <option value={value} key={value}>{label}</option>)}</select></label>
-      <label htmlFor="scene-content">屏幕文字<textarea id="scene-content" rows={4} value={scene.content} maxLength={500} onChange={e => patchScene({ content: e.target.value })} /><small>每行一个要点，建议不超过 3 行。</small></label>
+      <label htmlFor="scene-kind">画面类型<select id="scene-kind" value={scene.kind} onChange={e => setSceneKind(e.target.value as Scene['kind'])}>{Object.entries(labels).map(([value, label]) => <option value={value} key={value}>{label}</option>)}</select></label>
+      <label htmlFor="scene-content">屏幕文字<textarea id="scene-content" rows={4} value={scene.content} maxLength={500} onChange={e => patchScene({ content: e.target.value })} /><small>{scene.kind === 'steps' ? '每行一步，1～5 行，每行最多 80 字。' : '每行一个要点，建议不超过 3 行。'}</small></label>{scene.kind === 'comparison' && scene.comparison && <ComparisonFields value={scene.comparison} onChange={comparison => patchScene({ comparison })} />}
       <label htmlFor="scene-narration">讲解稿<textarea id="scene-narration" rows={5} value={scene.narration} maxLength={500} onChange={e => patchScene({ narration: e.target.value })} /><small>先确认讲解，再生成配音。修改后旧配音会标记为需要更新。</small></label>
       <label htmlFor="scene-duration">{audio[scene.id] ? '画面时长（按配音自动匹配）' : '画面时长（秒）'}<input id="scene-duration" type="number" min={3} max={60} step={0.5} disabled={!!audio[scene.id]} value={audio[scene.id] ? timeline[selected].durationInFrames / 30 : scene.durationSeconds} onChange={e => { const n = Number(e.target.value); if (Number.isFinite(n)) patchScene({ durationSeconds: Math.max(3, Math.min(60, n)) }); }} /></label>
     </fieldset><NarrationPanel scene={scene} projectId={projectId} assets={speech.assets} jobs={speech.jobs} config={speechConfig} busy={busy} error={speechError} onChange={patchScene} onGenerate={force => void generateNarration([scene.id], force)} onListen={() => player.current?.pause()} /><div className="inspector-note">已就绪的配音按实际音频时长安排画面，并保留结尾停顿。带配音导出需要每节的配音均匹配当前讲解。</div></aside></div>
