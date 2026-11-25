@@ -7,6 +7,14 @@ const job: AiJob = { id: 'j', projectId: 'p', baseVersion: 1, model: 'deepseek-f
   input: { kind: 'lesson', topic: '缓存', audience: '初学者', targetSeconds: 60 },
   sourceLesson: createExampleLesson(), result: createExampleLesson('草稿'), status: 'succeeded', error: null,
   usage: null, appliedVersion: null, undoneVersion: null, createdAt: '2026-11-25' };
+test('latest undone draft stays visible instead of resurfacing an older applied draft', async () => {
+  const { currentAiDraft } = await rules();
+  const undone: AiJob = { ...job, id: 'latest', status: 'undone' };
+  const old: AiJob = { ...job, id: 'old', status: 'applied' };
+  assert.equal(currentAiDraft([undone, old])?.id, 'latest');
+  assert.equal(currentAiDraft([{ ...undone, status: 'discarded' }, old])?.id, 'old');
+  assert.equal(currentAiDraft([]), undefined);
+});
 test('AI draft application is blocked by unsaved edits and newer saved versions', async () => {
   const { draftActionState } = await rules();
   assert.equal(draftActionState(job, 1, false).canApply, true);

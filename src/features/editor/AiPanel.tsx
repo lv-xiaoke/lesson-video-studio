@@ -3,7 +3,7 @@ import { useCallback, useEffect, useState } from 'react';
 import type { Project } from '@/shared/lesson';
 import type { AiConfig, AiInput, AiJob } from '@/shared/ai';
 import { parseAiInput } from '@/shared/ai-validation';
-import { draftActionState } from '@/shared/ai-editor';
+import { currentAiDraft, draftActionState } from '@/shared/ai-editor';
 import { request } from './api';
 import { AiDraftPreview } from './AiDraftPreview';
 
@@ -36,7 +36,7 @@ export function AiPanel({ project, sceneId, dirty, busy, prepareProject, onAppli
     void poll(); const timer = setInterval(poll, 2000);
     return () => { active = false; clearInterval(timer); };
   }, [path]);
-  const current = jobs.find(j => j.status !== 'discarded' && j.status !== 'undone');
+  const current = currentAiDraft(jobs);
   const pending = jobs.some(j => j.status === 'queued' || j.status === 'running');
   const unavailable = busy || requestBusy || pending || !config?.configured;
   const state = current ? draftActionState(current, project.version, dirty) : null;

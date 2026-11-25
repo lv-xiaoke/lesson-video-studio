@@ -1,4 +1,7 @@
 import type { AiJob } from './ai.ts';
+export function currentAiDraft(jobs: AiJob[]): AiJob | undefined {
+  return jobs.find(job => job.status !== 'discarded');
+}
 export function draftActionState(job: AiJob, projectVersion: number, dirty: boolean): { canApply: boolean; canUndo: boolean; reason: string | null } {
   const relevant = job.status === 'succeeded' || job.status === 'applied';
   if (relevant && dirty) return { canApply: false, canUndo: false, reason: '当前有未保存修改，请先处理编辑内容，再决定是否应用或撤销。' };

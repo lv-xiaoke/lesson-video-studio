@@ -16,9 +16,12 @@ const lesson = { title: '理解缓存', scenes: [
     comparison: { leftTitle: '没有缓存', leftPoints: ['重复计算'], rightTitle: '使用缓存', rightPoints: ['复用结果'] } },
 ] };
 let aiCalls = 0, ttsCalls = 0, failNext = '';
+let finishHold;
+const hold = new Promise(resolveHold => { finishHold = resolveHold; });
 const pcm = Buffer.alloc(32000);
 for (let i = 0; i < 16000; i++) pcm.writeInt16LE(Math.round(Math.sin(i * Math.PI * 2 * 440 / 16000) * 3000), i * 2);
 const fixture = createServer(async (req, res) => {
+  if (req.url === '/__finish') { res.end('finished'); finishHold(); return; }
   let raw = ''; for await (const chunk of req) raw += chunk;
   try {
     const body = JSON.parse(raw);
@@ -28,6 +31,7 @@ const fixture = createServer(async (req, res) => {
       assert.deepEqual(body.response_format, { type: 'json_object' }); assert.equal(body.stream, false);
       const task = JSON.parse(body.messages[1].content).task;
       const failure = failNext; failNext = '';
+      if (failure === 'timeout') return; // Exercise the production 120-second abort without a vendor call.
       if (failure === 'disconnect') { req.socket.destroy(); return; }
       if (failure === 'quota' || failure === 'rate') { res.statusCode = failure === 'quota' ? 402 : 429; res.end(JSON.stringify({ error: { message: 'fixture-only' } })); return; }
       const result = task.kind === 'scene' ? { scene: { ...lesson.scenes[0], id: 'injected', voice: { voiceId: '402000', speed: 2 }, narration: '我们先用生活中的例子理解缓存，再观察结果如何复用。' } } : lesson;
@@ -73,7 +77,7 @@ async function finished(id, fail = false) {
     const jobs = (await api(path())).data; const job = jobs.find(j => j.id === id);
     if (job?.status === 'failed') { if (fail) return job; throw new Error(job.error); }
     return !fail && job?.status === 'succeeded' ? job : false;
-  });
+  }, 150_000);
 }
 async function action(job, actionName, version = project.version) {
   return api(path() + '/' + job.id, 'POST', { action: actionName, version });
@@ -90,6 +94,8 @@ try {
   launch(['src/worker/index.ts'], 'worker');
   const ready = await finished(queued.id); assert.equal(aiCalls, 1); assert.equal(ttsCalls, 0);
   assert.equal((await current()).data.version, 1);
+  const other = (await api('/api/projects', 'POST', { title: '隔离检查' })).data;
+  assert.equal((await api('/api/projects/' + other.id + '/ai/' + ready.id, 'POST', { action: 'apply', version: other.version })).status, 404);
   project = (await action(ready, 'apply')).data.project; assert.equal(project.version, 2);
   assert.equal((await action(ready, 'apply', 1)).data.project.version, 2);
   project = (await action(ready, 'undo')).data.project; assert.equal(project.version, 3);
@@ -101,6 +107,9 @@ try {
   const audioPath = '/api/projects/' + project.id + '/narrations';
   assert.equal((await api(audioPath, 'POST', { version: project.version, sceneIds: project.lesson.scenes.map(s => s.id) })).status, 202);
   let audio = await waitFor(async () => { const r = await api(audioPath); return r.data.assets.length === 2 ? r.data : false; });
+  const sample = await fetch(base + audioPath + '/' + audio.assets[0].id, { headers: { Range: 'bytes=0-99' }, signal: AbortSignal.timeout(10_000) });
+  assert.equal(sample.status, 206); assert.equal((await sample.arrayBuffer()).byteLength, 100);
+  assert.equal(sample.headers.get('content-type'), 'audio/wav');
   const preserved = audio.assets.find(a => a.sceneId === project.lesson.scenes[1].id).id;
   const rewrite = await finished((await enqueue({ kind: 'scene', sceneId: project.lesson.scenes[0].id, instruction: '用生活例子解释' })).id);
   const original = structuredClone(project.lesson);
@@ -118,12 +127,13 @@ try {
   await finished(conflict.id); assert.equal((await action(conflict, 'apply')).status, 409);
   await action(conflict, 'discard');
   const ttsBefore = ttsCalls;
-  for (const mode of ['quota', 'rate', 'json', 'disconnect']) {
+  for (const mode of ['quota', 'rate', 'json', 'disconnect', 'timeout']) {
     const before = aiCalls; failNext = mode;
     const failed = await finished((await enqueue(input)).id, true);
     assert(!failed.error.includes('fixture-only')); await pause(500); assert.equal(aiCalls, before + 1);
     await action(failed, 'discard');
   }
+  assert.equal((await current()).data.version, project.version);
   assert.equal(ttsCalls, ttsBefore);
   const exportPath = '/api/projects/' + project.id + '/exports';
   const render = await api(exportPath, 'POST', { version: project.version, includeAudio: true }); assert.equal(render.status, 202);
@@ -133,10 +143,15 @@ try {
   const info = JSON.parse(execFileSync('ffprobe', ['-v', 'error', '-show_entries', 'stream=codec_type,codec_name:format=duration', '-of', 'json', output], { encoding: 'utf8', windowsHide: true }));
   assert(info.streams.some(s => s.codec_name === 'h264')); assert(info.streams.some(s => s.codec_name === 'aac'));
   assert(Math.abs(Number(info.format.duration) - 6) < 0.1);
-  const result = { fixtureOnly: true, aiCalls, ttsCalls, duration: info.format.duration, output, projectId: project.id };
+  const result = { fixtureOnly: true, aiCalls, ttsCalls, duration: info.format.duration, output, projectId: project.id, fixturePort, webPort: port, editorUrl: base + '/projects/' + project.id };
   writeFileSync(join(root, 'result.json'), JSON.stringify(result, null, 2));
   console.log('PASS: AI draft lifecycle, idempotency, rewrite isolation, conflicts, no automatic retries, audio reuse and MP4.');
   console.log(JSON.stringify(result));
+  if (process.env.VERIFY_AI_HOLD === '1') {
+    console.log('Holding fixture services for browser QA; POST /__finish on fixture port to close.');
+    const timer = setTimeout(finishHold, 20 * 60_000);
+    try { await hold; } finally { clearTimeout(timer); }
+  }
 } finally {
   for (const child of children) if (child.exitCode === null) child.kill();
   await pause(500); for (const fd of fds) closeSync(fd);

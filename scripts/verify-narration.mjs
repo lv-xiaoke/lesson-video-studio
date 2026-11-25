@@ -71,6 +71,10 @@ try {
   let result = await api('/api/projects', 'POST', { title: '配音协议验收（测试音，不是真人配音）' });
   assert.equal(result.status, 201); let project = result.data;
   project.lesson.scenes.forEach((s, i) => { s.durationSeconds = 3; s.narration = ['先看有序数据。', '比较中间的数字。', '缩小范围后继续。'][i]; });
+  project.lesson.scenes[0].kind = 'steps';
+  project.lesson.scenes[0].content = '观察有序数据\n比较中间数字\n缩小搜索范围';
+  project.lesson.scenes[1].kind = 'comparison';
+  project.lesson.scenes[1].comparison = { leftTitle: '逐个查找', leftPoints: ['依次比较'], rightTitle: '二分查找', rightPoints: ['每次排除一半'] };
   if (isTencent) project.lesson.scenes[0].narration = '教学示例。'.repeat(31);
   result = await api(`/api/projects/${project.id}`, 'PUT', { lesson: project.lesson, version: project.version });
   assert.equal(result.status, 200); project = result.data;
