@@ -24,12 +24,13 @@ export function AiPanel({ project, sceneId, dirty, busy, prepareProject, onAppli
   const [requestBusy, setRequestBusy] = useState(false);
   const [error, setError] = useState('');
   const [loadError, setLoadError] = useState('');
+  const [configError, setConfigError] = useState('');
   const [message, setMessage] = useState('');
   const path = '/api/projects/' + project.id + '/ai';
   const refresh = useCallback(async () => { setJobs(await request<AiJob[]>(path)); }, [path]);
   useEffect(() => {
     let active = true;
-    request<AiConfig>('/api/ai/config').then(c => { if (active) setConfig(c); }).catch(() => { if (active) setLoadError('无法读取 AI 服务配置，请刷新后重试。'); });
+    request<AiConfig>('/api/ai/config').then(c => { if (active) setConfig(c); }).catch(() => { if (active) setConfigError('无法读取 AI 服务配置，请刷新后重试。'); });
     const poll = async () => {
       try { const result = await request<AiJob[]>(path); if (active) { setJobs(result); setLoadError(''); } }
       catch { if (active) setLoadError('暂时无法读取 AI 草稿，将自动重新读取状态。'); }
@@ -68,7 +69,7 @@ export function AiPanel({ project, sceneId, dirty, busy, prepareProject, onAppli
     finally { setRequestBusy(false); onBusyChange(false); }
   }
   return <details className="ai-panel" open>
-    <summary><span>AI 备课助手</span><small>{config?.configured ? 'DeepSeek 已配置' : '填写主题，先生成可审核草稿'}</small></summary>
+    <summary><span>AI 备课助手</span><small>{config?.configured ? 'DeepSeek 已配置' : config ? '尚未配置 DeepSeek' : '正在读取配置…'}</small></summary>
     <div className="ai-panel-body">
       <p className="ai-intro">AI 帮你安排小节和编写讲解，生成后由你审核、应用，再配音。每次生成会调用 DeepSeek API。</p>
       {config && !config.configured && <p className="speech-config-note">尚未配置 DeepSeek。请在本机 .env.local 填写 DEEPSEEK_API_KEY，重启网页和后台程序。手动制作仍可使用。</p>}
@@ -82,7 +83,7 @@ export function AiPanel({ project, sceneId, dirty, busy, prepareProject, onAppli
         <label htmlFor="ai-instruction">修改要求<textarea id="ai-instruction" disabled={unavailable} rows={2} maxLength={1000} value={instruction} onChange={e => setInstruction(e.target.value)} placeholder="例如：讲简单一点，加一个生活中的例子。" /></label>
         <button type="button" disabled={unavailable || !instruction.trim()} onClick={() => void generate({ kind: 'scene', sceneId, instruction })}>生成此节改写草稿</button>
       </div>
-      {(error || loadError) && <p role="alert" className="error">{error || loadError}</p>}
+      {(error || configError || loadError) && <p role="alert" className="error">{error || configError || loadError}</p>}
       {message && <p role="status" className="ai-message">{message}</p>}
       {current && <section className="ai-result">
         <label htmlFor="ai-history">查看草稿记录<select id="ai-history" value={current.id} disabled={busy || requestBusy} onChange={event => setSelectedJobId(event.target.value)}>
