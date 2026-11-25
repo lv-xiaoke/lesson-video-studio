@@ -36,7 +36,7 @@ export function NarrationPanel({ scene, projectId, assets, jobs, config, busy, e
       <label htmlFor="voice-speed">语速：{isTencent ? '约 ' : ''}{voice.speed.toFixed(1)} 倍<input id="voice-speed" type="range" min={isTencent ? 0.6 : 0.5} max={2} step={0.1} value={voice.speed} onChange={e => onChange({ voice: { ...voice, speed: Number(e.target.value) } })} /></label>
       <button type="button" disabled={!validVoice} onClick={() => onApplyAll(voice)}>将此音色和语速应用到全部小节</button>
     </fieldset>
-    {isLocal && <VoiceLibrary voices={voices} ready={!!config?.configured} onRefresh={onRefreshVoices} onSelect={voiceId => onChange({ voice: { ...voice, voiceId } })} onListen={onListen} />}
+    {isLocal && <VoiceLibrary onRefresh={onRefreshVoices} />}
     <p className="speech-cost">此节 {Array.from(scene.narration).length} 字符{isLocal ? ' · 本机 CPU 生成，无 API 费用' : isTencent ? ' · 腾讯云配音' : estimate === null ? ' · 未配置参考单价' : ` · 预计 ¥${estimate.toFixed(4)}`}<br /><small>{isLocal ? '生成时请保持本地引擎和后台程序运行。' : isTencent ? '剩余额度与到期时间请在腾讯云控制台查看，后付费保持关闭。' : `按字符参考估算，实际计费以 MiniMax 账单为准。模型：${config?.model || '—'}`}</small></p>
     {asset && <div className="audio-preview"><audio aria-label="试听当前小节配音" controls preload="metadata" src={`/api/projects/${projectId}/narrations/${asset.id}`} onPlay={onListen} /><p>{asset.durationSeconds.toFixed(2)} 秒 · {asset.usageCharacters === null ? '未返回计费字符数' : `${asset.usageCharacters} 计费字符`}{asset.estimatedCny === null ? '' : ` · 参考费用 ¥${asset.estimatedCny.toFixed(4)}`}</p></div>}
     {stale && <p className="speech-help">讲解或声音设置已改变，旧音频不会进入当前预览与导出。原文件仍保留。</p>}

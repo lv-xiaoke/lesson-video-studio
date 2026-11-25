@@ -7,13 +7,23 @@ import time
 import server
 
 
-def hung_model(_config, deadline):
+def hung_model(_config, deadline, _stage=None):
     deadline.value = time.monotonic() + 0.15
     while True:
         time.sleep(0.05)
 
 
+def asr_native_crash(config, deadline, stage):
+    import os
+    if not config.get("disableAsr"):
+        stage.value = 4
+        os._exit(7)
+
+
 class ValidationTests(unittest.TestCase):
+    def test_native_asr_crash_restarts_without_asr(self):
+        self.assertTrue(server.supervise_models({}, asr_native_crash))
+
     def test_supervisor_terminates_a_model_that_exceeds_its_deadline(self):
         started = time.monotonic()
         self.assertTrue(server.run_model_process({}, hung_model))

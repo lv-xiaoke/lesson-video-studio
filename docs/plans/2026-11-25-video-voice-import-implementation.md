@@ -31,10 +31,10 @@
 
 **Interfaces:** `load_recognizer(model_dir)` 与 `transcribe(recognizer, pcm, sample_rate)`；HTTP `/transcribe` 请求 `{audio: base64Wav, timeoutSeconds}`，返回 `{text}`。
 
-- [ ] 先添加无效 WAV、静音、长度及识别控制标签清理测试，运行 `python -m unittest discover -s tools/zipvoice` 看缺功能失败。
-- [ ] 固定官方 SenseVoice INT8 模型及校验值，扩展安装器安全提取；不装额外框架。
-- [ ] 增加独立加载容错、健康状态、鉴权与超时识别端点，真实合成参考的识别测试记录耗时。
-- [ ] Python 测试通过并提交。
+- [x] 先添加无效 WAV、静音、长度及识别控制标签清理测试，运行 `python -m unittest discover -s tools/zipvoice` 看缺功能失败。
+- [x] 固定官方 SenseVoice INT8 模型及校验值，扩展安装器安全提取；不装额外框架。
+- [x] 增加独立加载容错、健康状态、鉴权与超时识别端点，真实合成参考的识别测试记录耗时。
+- [x] Python 测试通过并提交。
 
 ## Task 2: 导入资料与提取队列
 
@@ -42,9 +42,9 @@
 
 **Interfaces:** `VoiceImportStore.create/list/get/claim/complete/fail/save/recoverInterrupted`；`extractReference(path,start,duration)`；`processVoiceImport(job,store)`。
 
-- [ ] 测试区间校验、队列互斥、失败重启、识别与确认分离、幂等保存。测试生成的 MP4 提取实际时长、越界、无音轨和伪装扩展名，先运行看预期失败。
-- [ ] 实现不可变媒体任务与事务保存，FFmpeg 固定解复用器、限定协议及超时，输出标准 WAV 并拒绝无声片段；适配器调用本地识别，过滤无效结果。
-- [ ] Worker 串行接入导入任务，保留 TTS/导出流程；运行 `npm test` 和 `npm run typecheck`，预期通过并提交。
+- [x] 测试区间校验、队列互斥、失败重启、识别与确认分离、幂等保存。测试生成的 MP4 提取实际时长、越界、无音轨和伪装扩展名，先运行看预期失败。
+- [x] 实现不可变媒体任务与事务保存，FFmpeg 固定解复用器、限定协议及超时，输出标准 WAV 并拒绝无声片段；适配器调用本地识别，过滤无效结果。
+- [x] Worker 串行接入导入任务，保留 TTS/导出流程；运行 `npm test` 和 `npm run typecheck`，预期通过并提交。
 
 ## Task 3: 流式上传与音色库 API
 
@@ -52,24 +52,24 @@
 
 **Interfaces:** 原始文件请求体流式写入随机目录；元数据只用于展示及时间范围，不接收路径；公开接口剥离内部路径。
 
-- [ ] 先测实际字节超限、空文件、未知扩展、上传中断、JSON 保存超限及重复保存。
-- [ ] 实现同源 API、流式限制、查询任务、试听片段和保存；返回错误不泄露本机服务配置。
-- [ ] 跑全测试、类型检查，预期通过并提交。
+- [x] 先测实际字节超限、空文件、未知扩展、上传中断、JSON 保存超限及重复保存。
+- [x] 实现同源 API、流式限制、查询任务、试听片段和保存；返回错误不泄露本机服务配置。
+- [x] 跑全测试、类型检查，预期通过并提交。
 
 ## Task 4: 独立页面与编辑器入口
 
 **Files:** `src/app/voices/page.tsx`, `src/features/voices/{VoiceManager,VoiceCollection,MediaImport}.tsx`, `src/features/voices/voices.css`, `src/features/editor/VoiceLibrary.tsx`, `src/features/projects/ProjectList.tsx`, `src/features/editor/Editor.tsx`。
 
-- [ ] 按现有视觉体系设计独立页面：左侧导入并选择片段，中间显示提取/识别/校对，右侧管理已有音色；窄屏顺序排列。
-- [ ] 接入媒体本地预览、时间选择、异步任务恢复、音频试听、文本校对、显式保存；允许改名/停用/合成试听。
-- [ ] 编辑器改为打开独立音色库并刷新选择列表，返回页面焦点时自动刷新；原课程草稿不丢失。
-- [ ] 跑测试、类型检查和构建，真实页面检查流程。
+- [x] 按现有视觉体系设计独立页面：左侧导入并选择片段，中间显示提取/识别/校对，右侧管理已有音色；窄屏顺序排列。
+- [x] 接入媒体本地预览、时间选择、异步任务恢复、音频试听、文本校对、显式保存；允许改名/停用/合成试听。
+- [x] 编辑器改为打开独立音色库并刷新选择列表，返回页面焦点时自动刷新；原课程草稿不丢失。
+- [x] 跑测试、类型检查和构建，真实页面检查流程。
 
 ## Task 5: 验证、审查和交付
 
 **Files:** `scripts/verify-voice-import.mjs`, `README.md`, `docs/操作指南.md`, 本计划及进度记录。
 
-- [ ] 独立 DATA_DIR 和自有临时端口，生成带声视频，验证提取/识别/校对/保存/复用/无音轨失败；真实模型与协议验证区分报告。
-- [ ] 独立最终审查，重要问题用回归测试修复，运行全部测试、类型检查和构建。
-- [ ] 队列空闲时核对身份并重启所属服务，确认正式页面与识别健康，更新操作指南及性能记录。
-- [ ] 扫描密钥、fetch 核对 main，提交并上传，保留用户未提交文档。
+- [x] 独立 DATA_DIR 和自有临时端口，生成带声视频，验证提取/识别/校对/保存/复用/无音轨失败；真实模型与协议验证区分报告。
+- [x] 独立最终审查，重要问题用回归测试修复，运行全部测试、类型检查和构建。
+- [x] 队列空闲时核对身份并重启所属服务，确认正式页面与识别健康，更新操作指南及性能记录。
+- [x] 扫描密钥、fetch 核对 main，提交并上传，保留用户未提交文档。

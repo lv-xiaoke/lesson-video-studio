@@ -94,7 +94,13 @@ powershell -NoProfile -ExecutionPolicy Bypass -File scripts/start-local-services
 
 只启动本地引擎可使用 `scripts/start-zipvoice.ps1`。服务监听回环地址，使用本机生成的令牌；网页只访问 Next.js。`ZIPVOICE_THREADS` 可在启动脚本前设置，默认 4 线程。脚本与 Web/Worker 使用同一个环境变量或 `.env.local` 中的 `DATA_DIR`。
 
-在课程右侧「声音」选择「本地 ZipVoice」，打开「管理我的音色」。上传 3～30 秒、最大 10 MB 的 WAV/MP3，填写准确原文及名称并保存；再明确选择音色，可一键应用到全部小节。保存参考录音与文字，不进行每人单独训练；修改原录音需新建音色。停用不删除原文件，不影响既有音频和已排队任务。第一版需要手填原文，未内置真人参考录音。
+首页和编辑器的「音色库」进入独立 `/voices` 页面。支持最大 200 MB 的 MP4/MOV/M4V/WebM/MKV/WAV/MP3，选取 3～30 秒参考片段；FFmpeg 提取声音，SenseVoice INT8 在本机识别，听音频并校对文字后保存音色。也可用手动表单上传最大 10 MB 的 WAV/MP3 和准确原文。课程中仍选择音色并应用到全部小节，返回页面时自动刷新列表。
+
+识别模型复用 sherpa-onnx，额外下载约 163 MB。旧安装运行 `python scripts/setup-zipvoice.py` 补充模型，队列空闲时运行 `powershell -NoProfile -ExecutionPolicy Bypass -File scripts/start-zipvoice.ps1 -Restart`。已有配音服务及密钥不变；ASR 模型异常会自动降级保留 TTS。音色保存的是参考录音与文字，不为每人重新训练。原录音不可覆盖，需更换时新建音色；停用保留历史资料。没有内置真人参考录音。
+
+导入任务在 Worker 中串行执行，可重载页面找回；识别草稿不会自动生成音色，保存使用事务确保幂等。原文件流式接收，失败且未入队时只清理本次确切文件；已入队的失败记录及资料保留供排查，不进行批量删除。支持无时长元数据的流式 WebM/MKV，以实际音轨采样数检查选区完整性。推理只有本地调用，不发送到第三方服务。
+
+完整验证：`node scripts/verify-voice-import.mjs` 使用独立数据与端口的协议夹具，覆盖满队列拒绝、提取、校对保存、复用及带声 MP4；设置 `VERIFY_IMPORT_REAL=1` 时使用实际 SenseVoice/ZipVoice，并可通过第一个命令行参数提供明确的测试参考录音（默认使用先前的合成测试参考）。本机 6 秒视频提取及识别约 1.3 秒；识别准确率不作保证，需要人工校对。
 
 实测（2026-11-25，i9-14900HX，31.7 GB RAM，CPU 4 线程）：初次加载约 3 秒；101 字中文首次约 39 秒、热生成约 35 秒，输出约 18 秒；模型进程生成后工作集约 791 MB。模型包、声码器和额外英文词典下载约 170 MB，安装展开及 Python 环境还会额外占用磁盘。用系统合成参考音完成真实引擎及有声 MP4 测试；真人相似度、自然度和两位说话人区分度需要上传实际录音试听，不能由协议测试证明。
 

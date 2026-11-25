@@ -18,13 +18,13 @@ export function ProjectList() {
     } catch (e) { setError(e instanceof Error ? e.message : '创建失败'); setBusy(false); }
   }
   return <div className="home-shell">
-    <header className="home-header"><Link className="brand" href="/">知帧<span>教学视频工作台</span></Link><span className="edition">本地工作室 · 第一版</span></header>
+    <header className="home-header"><Link className="brand" href="/">知帧<span>教学视频工作台</span></Link><nav className="home-navigation" aria-label="工作台导航"><Link href="/voices">音色库</Link><span className="edition">本地工作室</span></nav></header>
     <main className="home-main"><div className="eyebrow">从一个知识点开始</div><h1>让知识，有画面。</h1><p className="home-description">将讲解整理成小节，一边编辑，一边预览。<br />先讲清楚，再导出一条属于你的教学视频。</p>
       <section className="create-card"><div><span className="pill">创建项目</span><h2>今天想讲清楚什么？</h2><p>新项目包含一份二分查找示例，可自由修改。</p></div><form onSubmit={e => { e.preventDefault(); void create(); }}><label htmlFor="project-title">视频标题</label><div className="create-row"><input id="project-title" value={title} onChange={e => setTitle(e.target.value)} maxLength={100} required disabled={busy} /><button className="primary" disabled={busy || !title.trim()}>{busy ? '正在创建…' : '进入制作'}</button></div></form></section>
       {error && <p className="error" role="alert">{error}</p>}
       <div className="section-heading"><h2>我的项目</h2><span>{projects.length} 个项目</span></div>
       {loading ? <p className="muted">正在读取项目…</p> : projects.length === 0 ? <div className="empty">从上面的示例开始，你的制作过程会保存在本机。</div> : <div className="project-grid">{projects.map(p => <Link className="project-card" href={`/projects/${p.id}`} key={p.id}><div className="project-cover"><span>LESSON / {String(p.lesson.scenes.length).padStart(2, '0')}</span><b>{p.lesson.title}</b></div><div className="project-meta"><span>{p.lesson.scenes.reduce((sum, s) => sum + s.durationSeconds, 0)} 秒 · 版本 {p.version}</span><span>{new Date(p.updatedAt).toLocaleDateString('zh-CN')}</span></div></Link>)}</div>}
-      <p className="workspace-note">当前可编辑、保存、预览，并按小节调用腾讯云或 MiniMax 生成配音、导出视频。项目内支持 DeepSeek 生成课程草稿与单节改写，确认应用后再生成配音。</p>
+      <p className="workspace-note">支持 DeepSeek 写稿、腾讯云 / MiniMax / 本地 ZipVoice 配音和视频导出。在独立音色库上传视频或录音，可提取声音、自动识别原文并保存音色。</p>
     </main><footer className="home-footer">知帧 / 把制作过程留在手边</footer>
   </div>;
 }

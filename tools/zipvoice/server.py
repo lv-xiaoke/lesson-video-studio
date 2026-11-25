@@ -55,13 +55,22 @@ def load_engine(model_dir, threads):
     return sherpa_onnx.OfflineTts(config)
 
 
-def serve(config, deadline):
+def serve(config, deadline, stage):
     import numpy as np
     import sherpa_onnx
     started = time.monotonic()
+    stage.value = 0
     engine = load_engine(config["modelDir"], int(os.environ.get("ZIPVOICE_THREADS", "4")))
+    from asr import load_recognizer, decode_audio, transcribe
+    try:
+        stage.value = 1
+        recognizer = None if config.get("disableAsr") else load_recognizer(config["modelDir"])
+    except Exception:
+        recognizer = None
+        print("Local ASR failed to load; TTS remains available", flush=True)
     loaded_seconds = time.monotonic() - started
     deadline.value = 0
+    stage.value = 2
     lock = threading.Lock()
 
     class Handler(BaseHTTPRequestHandler):
@@ -83,12 +92,12 @@ def serve(config, deadline):
                 return self.reply(401, b'{"error":"Unauthorized"}')
             if self.path != "/health":
                 return self.reply(404, b'{}')
-            self.reply(200, json.dumps({"ready": True, "model": MODEL_ID, "loadSeconds": round(loaded_seconds, 3)}).encode())
+            self.reply(200, json.dumps({"ready": True, "model": MODEL_ID, "asrReady": recognizer is not None, "loadSeconds": round(loaded_seconds, 3)}).encode())
 
         def do_POST(self):
             if not self.authorized():
                 return self.reply(401, b'{"error":"Unauthorized"}')
-            if self.path != "/synthesize":
+            if self.path not in ("/synthesize", "/transcribe"):
                 return self.reply(404, b'{}')
             acquired = False
             try:
@@ -97,14 +106,26 @@ def serve(config, deadline):
                 if not 0 < length <= 2_100_000:
                     raise ValueError("Invalid request size")
                 payload = json.loads(self.rfile.read(length))
-                text, reference, samples = validate_request(payload, self.headers.get("Authorization"), config["token"])
+                is_asr = self.path == "/transcribe"
+                if not isinstance(payload, dict):
+                    raise ValueError("Expected request object")
+                if is_asr:
+                    if recognizer is None:
+                        return self.reply(503, b'{"error":"ASR model not installed or unavailable"}')
+                    samples = decode_audio(payload.get("audio"))
+                else:
+                    text, reference, samples = validate_request(payload, self.headers.get("Authorization"), config["token"])
                 timeout = payload.get("timeoutSeconds", 900)
-                if not isinstance(timeout, (int, float)) or not math.isfinite(timeout) or not 0 < timeout <= 900:
+                if not isinstance(timeout, (int, float)) or not math.isfinite(timeout) or not 0 < timeout <= (120 if is_asr else 900):
                     raise ValueError("Invalid generation deadline")
                 acquired = lock.acquire(blocking=False)
                 if not acquired:
                     return self.reply(409, b'{"error":"Engine busy"}')
                 deadline.value = time.monotonic() + timeout
+                stage.value = 4 if is_asr else 3
+                if is_asr:
+                    result = transcribe(recognizer, samples)
+                    return self.reply(200, json.dumps({"text": result}, ensure_ascii=False).encode())
                 generation = sherpa_onnx.GenerationConfig()
                 generation.reference_audio = np.array(samples, dtype=np.float32) / 32768.0
                 generation.reference_sample_rate = 24000
@@ -129,16 +150,18 @@ def serve(config, deadline):
             finally:
                 if acquired:
                     deadline.value = 0
+                    stage.value = 2
                     lock.release()
 
     print(json.dumps({"ready": True, "loadSeconds": loaded_seconds}), flush=True)
     ThreadingHTTPServer(("127.0.0.1", int(config["port"])), Handler).serve_forever()
 
 
-def run_model_process(config, target=serve):
+def model_process_result(config, target=serve):
     """Parent owns deadline, so even native inference holding the GIL can be stopped."""
     deadline = multiprocessing.Value("d", time.monotonic() + 120)
-    child = multiprocessing.Process(target=target, args=(config, deadline), daemon=True)
+    stage = multiprocessing.Value("i", 0)
+    child = multiprocessing.Process(target=target, args=(config, deadline, stage), daemon=True)
     child.start()
     timed_out = False
     try:
@@ -152,12 +175,31 @@ def run_model_process(config, target=serve):
                     child.kill()
                     child.join()
                 break
+        result = {"timedOut": timed_out, "stage": stage.value, "exitCode": child.exitcode}
     finally:
         if child.is_alive():
             child.terminate()
             child.join(5)
         child.close()
-    return timed_out
+    return result
+
+
+def run_model_process(config, target=serve):
+    return model_process_result(config, target)["timedOut"]
+
+
+def supervise_models(config, target=serve):
+    settings = dict(config)
+    for _attempt in range(4):
+        result = model_process_result(settings, target)
+        if not result["timedOut"] and result["exitCode"] == 0:
+            return bool(settings.get("disableAsr"))
+        if result["stage"] in (1, 4):
+            settings["disableAsr"] = True
+            print("ASR process failed; restarting in TTS-only mode", flush=True)
+        else:
+            print("Local model process failed or exceeded deadline; restarting", flush=True)
+    raise RuntimeError("Local model repeatedly failed; automatic restart stopped")
 
 
 if __name__ == "__main__":
@@ -166,5 +208,4 @@ if __name__ == "__main__":
         settings = json.load(source)
     if not settings.get("token") or not 1024 <= int(settings["port"]) <= 65535:
         raise ValueError("Invalid local service settings")
-    while run_model_process(settings):
-        print("Local model exceeded deadline; restarting model process", flush=True)
+    supervise_models(settings)

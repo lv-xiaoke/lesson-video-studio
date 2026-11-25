@@ -8,7 +8,7 @@ import { VoiceStore } from '../../voices/store.ts';
 import { getStore } from '../../db/index.ts';
 import { splitLocalText, wavInfo, pcmWav, adjustSpeech } from '../../voices/audio.ts';
 
-function service() {
+export function localVoiceService() {
   const path = managedPath('zipvoice/service.json');
   if (!existsSync(path)) throw new Error('尚未安装本地模型，请先运行 ZipVoice 初始化脚本');
   const config = JSON.parse(readFileSync(path, 'utf8')) as { token: string; port: number };
@@ -16,13 +16,13 @@ function service() {
   return { url: `http://127.0.0.1:${config.port}`, token: config.token };
 }
 export function zipvoiceConfig(): SpeechConfig {
-  try { service(); return { provider: 'zipvoice', model: ZIPVOICE_MODEL, configured: true, pricePer10k: 0 }; }
+  try { localVoiceService(); return { provider: 'zipvoice', model: ZIPVOICE_MODEL, configured: true, pricePer10k: 0 }; }
   catch { return { provider: 'zipvoice', model: ZIPVOICE_MODEL, configured: false, pricePer10k: 0, reason: '本地模型未安装或服务配置损坏，请运行初始化脚本并检查本机配置' }; }
 }
 export async function zipvoiceHealth(): Promise<SpeechConfig> {
   const config = zipvoiceConfig(); if (!config.configured) return config;
   try {
-    const local = service(); const response = await fetch(local.url + '/health', { headers: { Authorization: `Bearer ${local.token}` }, signal: AbortSignal.timeout(2000) });
+    const local = localVoiceService(); const response = await fetch(local.url + '/health', { headers: { Authorization: `Bearer ${local.token}` }, signal: AbortSignal.timeout(2000) });
     const state = await response.json();
     if (!response.ok || !state.ready || state.model !== ZIPVOICE_MODEL) throw new Error();
     return config;
@@ -33,7 +33,7 @@ export async function synthesizeZipVoice(job: SpeechJob, voices = new VoiceStore
   if (!voice || !job.referenceHash || voice.hash !== job.referenceHash) throw new Error('音色资料缺失或已改变，请重新选择音色');
   const reference = await readFile(managedPath(voice.path));
   if (createHash('sha256').update(reference).digest('hex') !== voice.hash) throw new Error('参考录音校验失败，请重新上传音色');
-  const local = service(); const pcm: Buffer[] = []; const deadline = Date.now() + 15 * 60_000; const signal = AbortSignal.timeout(15 * 60_000);
+  const local = localVoiceService(); const pcm: Buffer[] = []; const deadline = Date.now() + 15 * 60_000; const signal = AbortSignal.timeout(15 * 60_000);
   try {
     for (const text of splitLocalText(job.text)) {
       if (!text.trim()) continue;

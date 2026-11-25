@@ -24,6 +24,7 @@ FILES = {
     "sherpa-onnx-zipvoice-distill-int8-zh-en-emilia.tar.bz2": BASE + "tts-models/sherpa-onnx-zipvoice-distill-int8-zh-en-emilia.tar.bz2",
     "vocos_24khz.onnx": BASE + "vocoder-models/vocos_24khz.onnx",
     "lexicon-en-us.txt": BASE + "tts-models/lexicon-en-us.txt",
+    "sherpa-onnx-sense-voice-zh-en-ja-ko-yue-int8-2024-07-17.tar.bz2": BASE + "asr-models/sherpa-onnx-sense-voice-zh-en-ja-ko-yue-int8-2024-07-17.tar.bz2",
 }
 
 
@@ -55,7 +56,8 @@ def main():
         measured[name] = digest
         print(name + ": " + str(path.stat().st_size) + " bytes, SHA256 " + digest, flush=True)
     (DATA / "download-checksums.json").write_text(json.dumps(measured, indent=2))
-    with tarfile.open(models / next(iter(FILES)), "r:bz2") as archive:
+    for archive_name in [name for name in FILES if name.endswith('.tar.bz2')]:
+      with tarfile.open(models / archive_name, "r:bz2") as archive:
         for member in archive.getmembers():
             # Exclude bundled celebrity demonstration recordings. Extract regular model files only.
             target = (models / member.name).resolve()

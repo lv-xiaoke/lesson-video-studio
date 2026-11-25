@@ -62,6 +62,10 @@ export function Editor({ projectId }: { projectId: string }) {
     return () => { active = false; clearInterval(timer); };
   }, [projectId, draft?.speechProvider, !!draft]);
   useEffect(() => { void refreshVoices().catch(() => setConfigError('无法读取本地音色库，请刷新页面重试。')); }, [refreshVoices]);
+  useEffect(() => {
+    const refresh = () => { void refreshVoices().catch(() => setConfigError('无法刷新本地音色库，请稍后重试。')); };
+    window.addEventListener('focus', refresh); return () => window.removeEventListener('focus', refresh);
+  }, [refreshVoices]);
   function changeProvider(provider: SpeechProvider) {
     if (!draft) return;
     player.current?.pause(); setSpeechConfig(null); setConfigError('');
@@ -197,7 +201,7 @@ export function Editor({ projectId }: { projectId: string }) {
     <a className="skip-link" href="#editor-main">跳到制作区</a>
     <header className="editor-header">
       <div className="editor-brand"><Link href="/" onClick={event => { if (dirty && !window.confirm('草稿尚未保存，确定返回吗？')) event.preventDefault(); }}>知帧<span>教学视频工作台</span></Link><span className="project-name" title={draft.title}>{draft.title}</span></div>
-      <div className="header-actions"><span className={dirty ? 'unsaved' : 'saved'}>{dirty ? '有未保存修改' : '已保存'}</span><button disabled={busy || !dirty} onClick={() => void saveAndMaybeExport(false)}>保存项目</button>
+      <div className="header-actions"><Link href="/voices" target="_blank" rel="noopener noreferrer">音色库</Link><span className={dirty ? 'unsaved' : 'saved'}>{dirty ? '有未保存修改' : '已保存'}</span><button disabled={busy || !dirty} onClick={() => void saveAndMaybeExport(false)}>保存项目</button>
         {stage === 'export' ? <button className="primary" disabled={busy || exporting || !readiness.ready} onClick={() => void saveAndMaybeExport(true)}>{exporting ? '视频制作中…' : useAudio ? '导出带配音视频' : '导出无声视频'}</button>
           : <button className="primary" disabled={busy} onClick={() => chooseStage(stage === 'edit' ? 'voice' : stage === 'voice' ? 'export' : 'edit')}>{stage === 'edit' ? '下一步：生成配音' : stage === 'voice' ? '下一步：预览导出' : '进入编辑确认'}<span aria-hidden="true"> →</span></button>}
       </div>

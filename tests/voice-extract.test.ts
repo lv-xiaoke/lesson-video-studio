@@ -1,0 +1,26 @@
+import { test } from 'node:test';
+import assert from 'node:assert/strict';
+import { execFileSync } from 'node:child_process';
+import { mkdirSync, writeFileSync } from 'node:fs';
+import { randomUUID } from 'node:crypto';
+import { resolve, join } from 'node:path';
+import { extractReference } from '../src/server/voices/extract.ts';
+import { wavInfo } from '../src/server/voices/audio.ts';
+test('video extraction uses selected range and rejects mute, out-of-range and disguised media', async () => {
+  const root = resolve('data/test-voice-import', randomUUID()); mkdirSync(root, { recursive: true });
+  const path = join(root, 'sample.mp4');
+  execFileSync('ffmpeg', ['-v', 'error', '-f', 'lavfi', '-i', 'color=size=64x64:rate=5:duration=6', '-f', 'lavfi', '-i', 'sine=frequency=400:duration=6', '-c:v', 'libx264', '-c:a', 'aac', '-shortest', path], { windowsHide: true });
+  const audio = await extractReference(path, 'mp4', 1, 4);
+  assert.ok(Math.abs(wavInfo(audio).durationSeconds - 4) < .1);
+  await assert.rejects(extractReference(path, 'mp4', 5, 4), /超出|范围/);
+  await assert.rejects(extractReference(path, 'wav', 0, 4), /文件|解码|格式/);
+  const mute = join(root, 'mute.mp4');
+  execFileSync('ffmpeg', ['-v', 'error', '-f', 'lavfi', '-i', 'color=size=64x64:rate=5:duration=6', '-c:v', 'libx264', mute], { windowsHide: true });
+  await assert.rejects(extractReference(mute, 'mp4', 0, 4), /音轨|声音/);
+  const partial = join(root, 'partial.mp4');
+  execFileSync('ffmpeg', ['-v', 'error', '-f', 'lavfi', '-i', 'color=size=64x64:rate=5:duration=10', '-f', 'lavfi', '-i', 'sine=frequency=400:duration=4', '-c:v', 'libx264', '-c:a', 'aac', partial], { windowsHide: true });
+  await assert.rejects(extractReference(partial, 'mp4', 0, 8), /完整|音轨|时长/);
+  const live = join(root, 'live.mkv');
+  writeFileSync(live, execFileSync('ffmpeg', ['-v', 'error', '-f', 'lavfi', '-i', 'color=size=64x64:rate=5:duration=6', '-f', 'lavfi', '-i', 'sine=frequency=400:duration=6', '-c:v', 'libx264', '-c:a', 'aac', '-f', 'matroska', 'pipe:1'], { windowsHide: true }));
+  assert.ok(Math.abs(wavInfo(await extractReference(live, 'mkv', 1, 4)).durationSeconds - 4) < .15);
+});
