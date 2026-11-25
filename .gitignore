@@ -2,7 +2,7 @@ node_modules/
 .next/
 .npm-cache/
 .remotion/
-data/
+/data/
 .env*
 !.env.example
 coverage/
