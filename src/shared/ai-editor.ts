@@ -1,6 +1,7 @@
 import type { AiJob } from './ai.ts';
-export function currentAiDraft(jobs: AiJob[]): AiJob | undefined {
-  return jobs.find(job => job.status !== 'discarded');
+export function currentAiDraft(jobs: AiJob[], selectedId?: string | null): AiJob | undefined {
+  const visible = jobs.filter(job => job.status !== 'discarded');
+  return visible.find(job => job.id === selectedId) || visible[0];
 }
 export function draftActionState(job: AiJob, projectVersion: number, dirty: boolean): { canApply: boolean; canUndo: boolean; reason: string | null } {
   const relevant = job.status === 'succeeded' || job.status === 'applied';

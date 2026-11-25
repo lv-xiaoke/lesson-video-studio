@@ -15,6 +15,13 @@ test('latest undone draft stays visible instead of resurfacing an older applied 
   assert.equal(currentAiDraft([{ ...undone, status: 'discarded' }, old])?.id, 'old');
   assert.equal(currentAiDraft([]), undefined);
 });
+test('history selection can revisit an earlier un-applied draft after a newer draft was applied or undone', async () => {
+  const { currentAiDraft } = await rules();
+  const newer: AiJob = { ...job, id: 'new', status: 'applied' };
+  assert.equal(currentAiDraft([newer, job], job.id)?.id, job.id);
+  assert.equal(currentAiDraft([{ ...newer, status: 'undone' }, job], job.id)?.id, job.id);
+  assert.equal(currentAiDraft([newer, { ...job, status: 'discarded' }], job.id)?.id, 'new');
+});
 test('AI draft application is blocked by unsaved edits and newer saved versions', async () => {
   const { draftActionState } = await rules();
   assert.equal(draftActionState(job, 1, false).canApply, true);

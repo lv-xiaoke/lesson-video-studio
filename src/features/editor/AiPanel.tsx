@@ -16,6 +16,7 @@ const statuses = { queued: '等待后台生成', running: 'DeepSeek 正在生成
 export function AiPanel({ project, sceneId, dirty, busy, prepareProject, onApplied, onBusyChange }: AiPanelProps) {
   const [config, setConfig] = useState<AiConfig | null>(null);
   const [jobs, setJobs] = useState<AiJob[]>([]);
+  const [selectedJobId, setSelectedJobId] = useState<string | null>(null);
   const [topic, setTopic] = useState(project.lesson.title);
   const [audience, setAudience] = useState('零基础学习者');
   const [seconds, setSeconds] = useState(120);
@@ -36,7 +37,7 @@ export function AiPanel({ project, sceneId, dirty, busy, prepareProject, onAppli
     void poll(); const timer = setInterval(poll, 2000);
     return () => { active = false; clearInterval(timer); };
   }, [path]);
-  const current = currentAiDraft(jobs);
+  const current = currentAiDraft(jobs, selectedJobId);
   const pending = jobs.some(j => j.status === 'queued' || j.status === 'running');
   const unavailable = busy || requestBusy || pending || !config?.configured;
   const state = current ? draftActionState(current, project.version, dirty) : null;
@@ -48,6 +49,7 @@ export function AiPanel({ project, sceneId, dirty, busy, prepareProject, onAppli
       const saved = await prepareProject();
       const job = await request<AiJob>(path, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ version: saved.version, input }) });
       setJobs(list => [job, ...list.filter(j => j.id !== job.id)]);
+      setSelectedJobId(job.id);
       setMessage('已提交生成任务。完成后请先检查草稿，再决定是否应用。');
     } catch (e) { setError(e instanceof Error ? e.message : 'AI 请求失败'); }
     finally { setRequestBusy(false); }
@@ -83,6 +85,9 @@ export function AiPanel({ project, sceneId, dirty, busy, prepareProject, onAppli
       {(error || loadError) && <p role="alert" className="error">{error || loadError}</p>}
       {message && <p role="status" className="ai-message">{message}</p>}
       {current && <section className="ai-result">
+        <label htmlFor="ai-history">查看草稿记录<select id="ai-history" value={current.id} disabled={busy || requestBusy} onChange={event => setSelectedJobId(event.target.value)}>
+          {jobs.filter(job => job.status !== 'discarded').map(job => <option key={job.id} value={job.id}>{new Date(job.createdAt).toLocaleString()} · {statuses[job.status]} · {job.input.kind === 'lesson' ? job.input.topic : '单节改写'} · {job.id.slice(0, 6)}</option>)}
+        </select></label>
         <div className="ai-result-heading"><b>{statuses[current.status]}</b><small>{current.input.kind === 'lesson' ? '整份课程' : '指定小节'} · {current.model}</small></div>
         {pending && <p className="speech-help">请保持后台制作程序运行。你可以继续编辑课程；有修改时，旧草稿将不能直接覆盖新版本。</p>}
         {current.status === 'failed' && <p className="speech-failure" role="alert">{current.error}<br />不会自动重试，请核对用量后再重新生成。</p>}

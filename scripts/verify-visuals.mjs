@@ -31,5 +31,17 @@ for (const maximum of [false, true]) {
     outputs.push(output);
   }
 }
+for (const [name, kind, content] of [
+  ['summary-eight-points', 'summary', Array.from({ length: 8 }, (_, i) => `第${i + 1}个总结要点`).join('\n')],
+  ['summary-long-copy', 'summary', '理解缓存怎样减少重复计算并保持结果正确。'.repeat(50).slice(0, 1000)],
+  ['title-long-copy', 'title', '把复杂问题分解成能够逐步理解并且能够复用的小步骤。'.repeat(50).slice(0, 1000)],
+]) {
+  const lesson = parseLesson({ title: name, scenes: [{ id: name, kind, title: '验证所有要点完整显示且不遮挡讲解', content, narration: '检查三秒小节的最后一帧，画面要点应当全部可见。', durationSeconds: 3 }] });
+  const inputProps = { lesson };
+  const composition = await selectComposition({ serveUrl, id: 'Lesson', inputProps, browserExecutable });
+  const output = join(root, name + '.png');
+  await renderStill({ serveUrl, composition, inputProps, browserExecutable, output, frame: 89 });
+  outputs.push(output);
+}
 writeFileSync(join(root, 'result.json'), JSON.stringify(outputs, null, 2));
 console.log(JSON.stringify(outputs));
