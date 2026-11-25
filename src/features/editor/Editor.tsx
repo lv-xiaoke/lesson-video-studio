@@ -14,14 +14,11 @@ import { SCENE_LABELS } from '@/shared/scene';
 import { appendScene, duplicateScene, removeScene, changeSceneKind } from '@/shared/scene-actions';
 import { SceneActions } from './SceneActions';
 import { ComparisonFields } from './ComparisonFields';
+import { AiPanel } from './AiPanel';
+import { request } from './api';
 
 const labels = SCENE_LABELS;
 const jobLabels = { queued: '等待后台制作', running: '正在制作', succeeded: '制作完成', failed: '制作失败' };
-async function request<T>(url: string, init?: RequestInit): Promise<T> {
-  const response = await fetch(url, init); const data = await response.json();
-  if (!response.ok) throw new Error(data.error || '操作失败');
-  return data as T;
-}
 export function Editor({ projectId }: { projectId: string }) {
   const [project, setProject] = useState<Project | null>(null);
   const [draft, setDraft] = useState<Lesson | null>(null);
@@ -100,6 +97,20 @@ export function Editor({ projectId }: { projectId: string }) {
     } catch (e) { setError(e instanceof Error ? e.message : '配音提交失败'); }
     finally { setBusy(false); }
   }
+  async function prepareProject(): Promise<Project> {
+    if (!project || !draft) throw new Error('项目尚未加载');
+    player.current?.pause();
+    if (!dirty) return project;
+    setBusy(true);
+    try {
+      const saved = await request<Project>('/api/projects/' + projectId, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ lesson: draft, version: project.version }) });
+      setProject(saved); setDraft(saved.lesson); return saved;
+    } finally { setBusy(false); }
+  }
+  function applyAiProject(saved: Project) {
+    player.current?.pause(); setProject(saved); setDraft(saved.lesson); setSelected(0);
+    void refreshSpeech().catch(() => setSpeechError('课程已更新，配音状态读取失败，请刷新页面'));
+  }
   function patchScene(patch: Partial<Scene>) {
     setDraft(current => current ? { ...current, scenes: current.scenes.map((s, i) => i === selected ? { ...s, ...patch } : s) } : current);
   }
@@ -139,7 +150,7 @@ export function Editor({ projectId }: { projectId: string }) {
   return <div className="editor-shell">
     <header className="editor-header"><div className="editor-brand"><Link href="/" onClick={e => { if (dirty && !window.confirm('草稿尚未保存，确定返回吗？')) e.preventDefault(); }}>知帧</Link><span className="divider" /><span className="project-name">{project.lesson.title}</span></div><div className="header-actions"><span className={dirty ? 'unsaved' : 'saved'}>{dirty ? '有未保存修改' : `已保存 · 版本 ${project.version}`}</span><button disabled={busy || !dirty} onClick={() => void saveAndMaybeExport(false)}>保存项目</button><button className="primary" disabled={busy || jobs.some(j => j.status === 'queued' || j.status === 'running')} onClick={() => void saveAndMaybeExport(true)}>{busy ? '正在处理…' : useAudio ? '导出带配音视频' : '导出无声视频'}</button></div></header>
     <div className="editor-body"><aside className="scene-sidebar"><div className="sidebar-title"><h2>教学小节</h2><span>{draft.scenes.length} 节</span></div><p className="sidebar-help">点击小节，调整画面与讲解。</p><div className="scene-list">{draft.scenes.map((s, i) => <button className={`scene-item ${selected === i ? 'active' : ''}`} onClick={() => select(i)} key={s.id} disabled={busy}><span className="scene-number">{String(i + 1).padStart(2, '0')}</span><span><b>{s.title || '未命名小节'}</b><small>{labels[s.kind]} · {(timeline[i].durationInFrames / 30).toFixed(1)} 秒</small></span></button>)}</div><div className="reorder"><button disabled={busy || selected === 0} onClick={() => move(-1)}>上移</button><button disabled={busy || selected === draft.scenes.length - 1} onClick={() => move(1)}>下移</button></div><SceneActions count={draft.scenes.length} busy={busy} onAction={manageScene} /><div className="sidebar-bottom"><span className="pill">制作说明</span><p>先编辑并确认讲解，再生成小节配音。修改文字、音色或语速后，只需更新受影响的小节。</p></div></aside>
-    <main className="preview-main"><div className="preview-heading"><div><span className="eyebrow">画面预览</span><h1>让每个知识点，都讲得清楚。</h1></div><span className="format">16:9 · 1080P · 30 FPS</span></div>
+    <main className="preview-main"><AiPanel project={project} sceneId={scene.id} dirty={dirty} busy={busy} prepareProject={prepareProject} onApplied={applyAiProject} onBusyChange={setBusy} /><div className="preview-heading"><div><span className="eyebrow">画面预览</span><h1>让每个知识点，都讲得清楚。</h1></div><span className="format">16:9 · 1080P · 30 FPS</span></div>
       <div className="player-wrap"><Player ref={player} component={LessonVideo} inputProps={{ lesson: draft, audio }} compositionWidth={1920} compositionHeight={1080} durationInFrames={totalFrames(draft.scenes, 30, audio)} fps={30} controls style={{ width: '100%', aspectRatio: '16 / 9' }} acknowledgeRemotionLicense /></div>
       <div className="preview-caption"><span>画面和字幕实时更新</span><span>总时长 {(totalFrames(draft.scenes, 30, audio) / 30).toFixed(1)} 秒 · {useAudio ? `${Object.keys(allAudio).length}/${draft.scenes.length} 节配音就绪` : '无配音预览'}</span></div>
       <div className="timeline-heading"><h2>内容顺序</h2><span>按小节组织，保留每一次修改</span></div><div className="visual-timeline">{timeline.map((entry, i) => <button key={entry.scene.id} className={selected === i ? 'active' : ''} style={{ flex: entry.durationInFrames }} onClick={() => select(i)}><span>{String(i + 1).padStart(2, '0')} / {labels[entry.scene.kind]}</span><b>{entry.scene.title}</b><small>{(entry.from / 30).toFixed(0)}s — {((entry.from + entry.durationInFrames) / 30).toFixed(0)}s</small></button>)}</div>

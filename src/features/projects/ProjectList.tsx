@@ -24,7 +24,7 @@ export function ProjectList() {
       {error && <p className="error" role="alert">{error}</p>}
       <div className="section-heading"><h2>我的项目</h2><span>{projects.length} 个项目</span></div>
       {loading ? <p className="muted">正在读取项目…</p> : projects.length === 0 ? <div className="empty">从上面的示例开始，你的制作过程会保存在本机。</div> : <div className="project-grid">{projects.map(p => <Link className="project-card" href={`/projects/${p.id}`} key={p.id}><div className="project-cover"><span>LESSON / {String(p.lesson.scenes.length).padStart(2, '0')}</span><b>{p.lesson.title}</b></div><div className="project-meta"><span>{p.lesson.scenes.reduce((sum, s) => sum + s.durationSeconds, 0)} 秒 · 版本 {p.version}</span><span>{new Date(p.updatedAt).toLocaleDateString('zh-CN')}</span></div></Link>)}</div>}
-      <p className="workspace-note">当前可编辑、保存、预览，并按小节调用腾讯云或 MiniMax 生成配音、导出视频。AI 自动编稿尚未接入。</p>
+      <p className="workspace-note">当前可编辑、保存、预览，并按小节调用腾讯云或 MiniMax 生成配音、导出视频。项目内支持 DeepSeek 生成课程草稿与单节改写，确认应用后再生成配音。</p>
     </main><footer className="home-footer">知帧 / 把制作过程留在手边</footer>
   </div>;
 }
