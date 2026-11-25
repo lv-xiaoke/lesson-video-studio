@@ -4,6 +4,7 @@ import type { AsrConfig, VoiceImport } from '@/shared/voice-import';
 import { MAX_MEDIA_BYTES, parseMediaSelection } from '@/shared/voice-import';
 import type { VoiceProfile } from '@/shared/voices';
 import { request } from '../editor/api';
+import { VoiceIcon } from './VoiceIcon';
 
 export function MediaImport({ config, onCreated, onVoiceSaved }: { config: AsrConfig | null; onCreated: (job: VoiceImport) => void; onVoiceSaved: () => Promise<void> }) {
   const [file, setFile] = useState<File | null>(null); const [url, setUrl] = useState('');
@@ -30,22 +31,21 @@ export function MediaImport({ config, onCreated, onVoiceSaved }: { config: AsrCo
     try {
       const form = new FormData(); form.set('audio', manualFile); form.set('name', manualName); form.set('referenceText', manualText);
       await request<VoiceProfile>('/api/voices', { method: 'POST', body: form });
-      await onVoiceSaved(); setManualFile(null); setManualName(''); setManualText(''); formElement.reset(); setMessage('手动音色已保存，可在右侧管理并试听。');
+      await onVoiceSaved(); setManualFile(null); setManualName(''); setManualText(''); formElement.reset(); setMessage('手动音色已保存，可在「我的音色」中管理并试听。');
     } catch (e) { setError(e instanceof Error ? e.message : '保存失败'); } finally { setBusy(false); }
   }
-  return <section className="voice-import-form" aria-labelledby="import-title">
-    <div className="voice-section-title"><span>1</span><h2 id="import-title">从视频或录音添加</h2></div>
-    <p className="voice-help">选一段清晰的单人讲话，声音和识别文字都会保存在本机。</p>
+  return <section id="voice-import-form" className="voice-import-form" aria-labelledby="import-title">
+    <div className="voice-section-title"><span className="voice-step">01</span><div><h2 id="import-title">导入声音素材</h2><p>一段清晰的单人讲话就够了。</p></div></div>
     <form onSubmit={event => void upload(event)}>
       <fieldset disabled={busy}>
-        <label htmlFor="voice-media-file">选择视频或音频<input id="voice-media-file" type="file" accept=".mp4,.mov,.m4v,.webm,.mkv,.wav,.mp3" required onChange={event => {
+        <label htmlFor="voice-media-file" className={'voice-upload-zone' + (file ? ' has-file' : '')}><input id="voice-media-file" className="voice-file-input" type="file" aria-label={file ? '更换视频或录音' : '选择视频或录音'} aria-describedby="voice-file-caption voice-file-format" accept=".mp4,.mov,.m4v,.webm,.mkv,.wav,.mp3" required onChange={event => {
           const selected = event.target.files?.[0] || null; setError(''); setMessage(''); setLength(null); setMediaError(false); setStart('0'); setDuration('20');
           if (selected && selected.size > MAX_MEDIA_BYTES) { setError('文件超过 200 MB，请先裁剪视频'); setFile(null); event.target.value = ''; } else setFile(selected);
-        }} /><small>MP4 / MOV / M4V / WebM / MKV / WAV / MP3，最大 200 MB。</small></label>
+        }} /><span className="upload-symbol"><VoiceIcon name={file ? 'file' : 'upload'} /></span><strong>{file ? '更换视频或录音' : '选择视频或录音'}</strong><span className="upload-description" id="voice-file-caption">{file ? file.name : '从一段声音，创建可反复使用的音色'}</span><span className="upload-format" id="voice-file-format">{file ? `${(file.size / 1024 / 1024).toFixed(1)} MB · ` : ''}MP4 / MOV / WebM / MKV / WAV / MP3 等 · 最大 200 MB</span></label>
         {url && <div className="source-player"><video controls preload="metadata" src={url} aria-label="导入媒体预览" onLoadedMetadata={event => { const value = event.currentTarget.duration; if (Number.isFinite(value)) { setLength(value); setDuration(String(Math.floor(Math.min(20, value) * 100) / 100)); } }} onError={() => setMediaError(true)} /><p>{length !== null ? `源文件时长 ${length.toFixed(2)} 秒` : mediaError ? '浏览器无法预览此格式，仍可填写范围，由后台提取。' : '正在读取预览…'}</p></div>}
-        <div className="clip-range"><label htmlFor="clip-start">从第几秒开始<input id="clip-start" type="number" min={0} max={7200} step={.01} required value={start} onChange={e => setStart(e.target.value)} /></label><label htmlFor="clip-duration">提取多少秒<input id="clip-duration" type="number" min={3} max={30} step={.01} required value={duration} onChange={e => setDuration(e.target.value)} /></label></div>
-        <p className="voice-help">只提取所选 3～30 秒片段并识别，不转写整部视频。建议 10～20 秒，避免背景音乐和多人同时讲话。</p>
-        <button type="submit" className="primary" disabled={!file || !config?.configured}>{busy ? '正在上传，请稍候…' : '提取声音并自动识别'}</button>
+        <div className="clip-range"><label htmlFor="clip-start">从第几秒开始<span className="number-input-wrap"><input id="clip-start" type="number" min={0} max={7200} step={.01} required value={start} onChange={e => setStart(e.target.value)} /><span aria-hidden="true">秒</span></span></label><label htmlFor="clip-duration">提取多少秒<span className="number-input-wrap"><input id="clip-duration" type="number" min={3} max={30} step={.01} required value={duration} onChange={e => setDuration(e.target.value)} /><span aria-hidden="true">秒</span></span></label></div>
+        <p className="voice-clip-tip"><VoiceIcon name="mic" /><span>选取 3～30 秒，建议 10～20 秒。尽量避开音乐和多人同时讲话。</span></p>
+        <button type="submit" className="primary" disabled={!file || !config?.configured}><VoiceIcon name="upload" />{busy ? '正在上传，请稍候…' : '提取声音并自动识别'}</button>
       </fieldset>
     </form>
     {!config?.configured && <p className="voice-help" role="status">{config?.reason || '正在检查本地识别服务…'}</p>}
